@@ -19,6 +19,7 @@
   ::-webkit-scrollbar-thumb{background:#c7c4ba;border-radius:6px;border:3px solid transparent;background-clip:padding-box}
   ::-webkit-scrollbar-track{background:transparent}
   .mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+  @keyframes aispin{to{transform:rotate(360deg)}}
 </style>
 </helmet>
 
@@ -172,6 +173,218 @@
               </div>
             </div>
           </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ORGANIGRAMA INTERACTIVO ============ -->
+      <sc-if value="{{ isOrganigrama }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:18px">
+          <sc-for list="{{ orgTabs }}" as="t" hint-placeholder-count="17">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 330px;gap:18px;align-items:start">
+          <!-- Árbol -->
+          <div style="background:#f6f5f1;border:1px solid #e6e4dd;border-radius:14px;padding:24px 22px;overflow-x:auto">
+            <div style="margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:#16202e">{{ orgData.title }}</span></div>
+            <div style="font-size:12px;color:#7a828f;margin-bottom:22px">{{ orgData.subtitle }} · clic en un cargo para ver el detalle</div>
+
+            <!-- raíz -->
+            <div style="display:flex;flex-direction:column;align-items:center;min-width:760px">
+              <button onClick="{{ orgData.root.onClick }}" style="{{ orgData.root.boxStyle }}">
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ orgData.root.dotColor }}"></span><span style="{{ orgData.root.cargoStyle }}">{{ orgData.rootCargo }}</span></div>
+                <div style="font-size:10.5px;color:#9098a4;margin-top:3px">{{ orgData.rootArea }} · <span class="mono">{{ orgData.rootN }}</span> pers.</div>
+              </button>
+              <div style="width:2px;height:22px;background:#cfccc2"></div>
+
+              <!-- nivel 1 -->
+              <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:nowrap">
+                <sc-for list="{{ orgData.lvl1Nodes }}" as="n" hint-placeholder-count="5">
+                  <div style="display:flex;flex-direction:column;align-items:center">
+                    <button onClick="{{ n.onClick }}" style="{{ n.boxStyle }}">
+                      <div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ n.dotColor }}"></span><span style="{{ n.cargoStyle }}">{{ n.cargo }}</span></div>
+                      <div style="font-size:10px;color:#9098a4;margin-top:3px">{{ n.area }} · <span class="mono">{{ n.n }}</span></div>
+                    </button>
+                    <sc-if value="{{ n.children.length }}" hint-placeholder-val="{{ 0 }}">
+                      <div style="width:2px;height:16px;background:#dcd9cf"></div>
+                      <div style="display:flex;flex-direction:column;gap:8px">
+                        <sc-for list="{{ n.children }}" as="c" hint-placeholder-count="2">
+                          <button onClick="{{ c.onClick }}" style="{{ c.boxStyle }}">
+                            <div style="display:flex;align-items:center;gap:7px"><span style="width:6px;height:6px;border-radius:50%;flex:none;background:{{ c.dotColor }}"></span><span style="font-size:11.5px;font-weight:600;color:#2b333f;line-height:1.2">{{ c.cargo }}</span></div>
+                            <div style="font-size:9.5px;color:#9098a4;margin-top:2px;padding-left:13px"><span class="mono">{{ c.n }}</span> pers.</div>
+                          </button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalle -->
+          <div style="position:sticky;top:90px;background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:22px 24px">
+            <div style="font-size:10.5px;letter-spacing:1px;color:#9098a4;font-weight:700;margin-bottom:12px">DETALLE DEL CARGO</div>
+            <h2 style="font-size:17px;font-weight:800;color:#16202e;letter-spacing:-.3px;line-height:1.2">{{ orgData.detail.cargo }}</h2>
+            <div style="margin:11px 0 16px"><span style="{{ orgData.detail.estadoStyle }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ orgData.detail.estadoDot }}"></span>{{ orgData.detail.estadoLabel }}</span></div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <div>
+                <div style="font-size:10.5px;letter-spacing:.4px;color:#9098a4;font-weight:700;margin-bottom:3px">ÁREA / DIRECCIÓN</div>
+                <div style="font-size:13px;color:#2b333f">{{ orgData.detail.area }}</div>
+              </div>
+              <div>
+                <div style="font-size:10.5px;letter-spacing:.4px;color:#9098a4;font-weight:700;margin-bottom:3px">DEPENDENCIA</div>
+                <div style="font-size:13px;color:#2b333f">{{ orgData.detail.dep }}</div>
+              </div>
+              <div style="display:flex;gap:24px">
+                <div><div style="font-size:10.5px;letter-spacing:.4px;color:#9098a4;font-weight:700;margin-bottom:3px">GRADO</div><div class="mono" style="font-size:13px;color:#2b333f">{{ orgData.detail.grado }}</div></div>
+                <div><div style="font-size:10.5px;letter-spacing:.4px;color:#9098a4;font-weight:700;margin-bottom:3px">DOTACIÓN</div><div class="mono" style="font-size:13px;color:#2b333f">{{ orgData.detail.n }} pers.</div></div>
+              </div>
+              <div>
+                <div style="font-size:10.5px;letter-spacing:.4px;color:#9098a4;font-weight:700;margin-bottom:4px">QUÉ HACE</div>
+                <div style="font-size:12.5px;color:#41505c;line-height:1.55">{{ orgData.detail.func }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ MODELO DOTACIÓN ÓPTIMA ============ -->
+      <sc-if value="{{ isOptimo }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+          <sc-for list="{{ optKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:16px;border-top:3px solid {{ k.accent }}">
+              <div class="mono" style="font-size:23px;font-weight:600;letter-spacing:-1px;color:#16202e;line-height:1.05">{{ k.value }}</div>
+              <div style="font-size:11px;color:#5b6573;margin-top:7px;line-height:1.3;font-weight:500">{{ k.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start">
+          <!-- Controles -->
+          <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:90px">
+            <div style="background:#16202e;border-radius:14px;padding:20px 22px;color:#fff">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <h2 style="font-size:14.5px;font-weight:700">Parámetros del modelo</h2>
+                <button onClick="{{ optControls.onReset }}" style="border:1px solid #38414f;background:transparent;color:#9aa3b3;font-family:inherit;font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;cursor:pointer">↺ Reset</button>
+              </div>
+              <p style="font-size:11px;color:#8b95a6;margin-bottom:16px;line-height:1.4">Mueve las variables y el modelo recalcula en vivo el déficit y el gasto.</p>
+
+              <div style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:#cfd5df">Carga objetivo</span><span class="mono" style="color:#fff;font-weight:600">{{ optControls.objetivo }}%</span></div>
+                <input type="range" min="80" max="120" step="1" value="{{ optControls.objetivo }}" onInput="{{ optControls.onObjetivo }}" style="width:100%;accent-color:#0f8378"></input>
+                <div style="font-size:10px;color:#6b7588;margin-top:3px">Carga considerada ideal (100% = equilibrio).</div>
+              </div>
+
+              <div style="margin-bottom:18px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:#cfd5df">Costo por cupo</span><span class="mono" style="color:#fff;font-weight:600">{{ optControls.costoTxt }}</span></div>
+                <input type="range" min="18000" max="45000" step="500" value="{{ optControls.costo }}" onInput="{{ optControls.onCosto }}" style="width:100%;accent-color:#0f8378"></input>
+                <div style="font-size:10px;color:#6b7588;margin-top:3px">Base: Subt.21 / dotación máx. 971 (Ley 21.796).</div>
+              </div>
+
+              <div style="font-size:10.5px;letter-spacing:.5px;color:#6b7588;font-weight:700;margin-bottom:10px">PONDERADORES DE CARGA</div>
+              <div style="margin-bottom:11px">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px"><span style="color:#cfd5df">Carga base</span><span class="mono" style="color:#fff">{{ optControls.wCarga }}</span></div>
+                <input type="range" min="0" max="100" step="5" value="{{ optControls.wCarga }}" onInput="{{ optControls.onWCarga }}" style="width:100%;accent-color:#2e90fa"></input>
+              </div>
+              <div style="margin-bottom:11px">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px"><span style="color:#cfd5df">Presión de vacancia</span><span class="mono" style="color:#fff">{{ optControls.wVac }}</span></div>
+                <input type="range" min="0" max="100" step="5" value="{{ optControls.wVac }}" onInput="{{ optControls.onWVac }}" style="width:100%;accent-color:#f79009"></input>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px"><span style="color:#cfd5df">Criticidad funcional</span><span class="mono" style="color:#fff">{{ optControls.wCrit }}</span></div>
+                <input type="range" min="0" max="100" step="5" value="{{ optControls.wCrit }}" onInput="{{ optControls.onWCrit }}" style="width:100%;accent-color:#d92d20"></input>
+              </div>
+            </div>
+
+            <!-- Presupuesto / Circular 12 -->
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:18px 20px">
+              <h2 style="font-size:13.5px;font-weight:700;color:#16202e;margin-bottom:12px">Holgura y Circular N°12</h2>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px"><span style="color:#6b7280">Holgura de dotación</span><span class="mono" style="color:#16202e;font-weight:600">{{ optBudget.holguraCupos }} cupos</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px"><span style="color:#6b7280">Déficit del modelo</span><span class="mono" style="color:#b42318;font-weight:600">{{ optBudget.totalDef }} cupos</span></div>
+              <div style="height:9px;background:#f1efe9;border-radius:5px;overflow:hidden;margin:10px 0"><div style="{{ optBudget.defBar }}"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:13px"><span style="color:#6b7280">Holgura referencial</span><span class="mono" style="color:#16202e;font-weight:600">{{ optBudget.holguraPesos }}</span></div>
+              <div style="{{ optBudget.cabeStyle }}">{{ optBudget.cabeLabel }}</div>
+              <p style="font-size:10.5px;color:#9098a4;margin-top:11px;line-height:1.45">El financiamiento existe en la Ley; la restricción operativa es la Circular N°12 de Hacienda. Los 17 cargos de conducción se regularizan a costo incremental $0.</p>
+            </div>
+          </div>
+
+          <!-- Tabla de perfiles + agregado -->
+          <div>
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:18px 22px;margin-bottom:16px">
+              <h2 style="font-size:14.5px;font-weight:700;color:#16202e;margin-bottom:3px">Déficit proyectado por categoría</h2>
+              <p style="font-size:11.5px;color:#7a828f;margin-bottom:14px">Gasto anual estimado para cerrar el déficit de cada categoría</p>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <sc-for list="{{ optCatAgg }}" as="c" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="width:96px;flex:none;font-size:12px;color:#444b57;font-weight:600">{{ c.cat }}</span>
+                    <div style="flex:1;height:9px;background:#f1efe9;border-radius:5px;overflow:hidden"><div style="{{ c.bar }}"></div></div>
+                    <span class="mono" style="width:42px;text-align:right;font-size:12px;color:#16202e;font-weight:600">+{{ c.def }}</span>
+                    <span class="mono" style="width:118px;text-align:right;font-size:12px;color:#b54708">{{ c.cost }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;overflow:hidden">
+              <div style="padding:16px 22px;border-bottom:1px solid #eeece6">
+                <h2 style="font-size:14.5px;font-weight:700;color:#16202e">Perfiles de cargo · criticidad y dotación óptima</h2>
+                <p style="font-size:11.5px;color:#7a828f;margin-top:2px">Ordenado por criticidad · clic en "Sugerencia" para ver la recomendación</p>
+              </div>
+              <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px">
+                  <thead>
+                    <tr style="background:#faf9f6;color:#6b7280;text-align:left">
+                      <th style="padding:10px 22px;font-weight:600;font-size:10.5px">PERFIL DE CARGO</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:right">ACTUAL</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:left">CARGA</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:right">ÓPTIMA</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:right">BRECHA</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:right">$/AÑO</th>
+                      <th style="padding:10px 8px;font-weight:600;font-size:10.5px;text-align:left">CRITICIDAD</th>
+                      <th style="padding:10px 22px;font-weight:600;font-size:10.5px"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <sc-for list="{{ optList }}" as="r" hint-placeholder-count="15">
+                      <tr style="border-top:1px solid #f0eee8">
+                        <td style="padding:11px 22px">
+                          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;flex:none;background:{{ r.catColor }}"></span><span style="font-weight:600;color:#16202e">{{ r.perfil }}</span></div>
+                          <div style="font-size:10.5px;color:#9098a4;margin-top:2px;padding-left:16px">{{ r.cat }} · grado {{ r.grados }} · <span class="mono">{{ r.vac }}</span> vac · <span style="{{ r.c12Style }}">{{ r.c12Label }}</span></div>
+                        </td>
+                        <td class="mono" style="padding:11px 8px;text-align:right;color:#16202e;font-weight:600">{{ r.dot }}</td>
+                        <td style="padding:11px 8px">
+                          <div style="display:flex;align-items:center;gap:7px">
+                            <div style="width:54px;height:6px;background:#f1efe9;border-radius:3px;overflow:hidden"><div style="{{ r.idxBar }}"></div></div>
+                            <span class="mono" style="font-size:11.5px;color:#16202e">{{ r.idxCarga }}</span>
+                          </div>
+                        </td>
+                        <td class="mono" style="padding:11px 8px;text-align:right;color:#0f7a4f;font-weight:600">{{ r.optima }}</td>
+                        <td class="mono" style="padding:11px 8px;text-align:right"><span style="{{ r.brechaStyle }}">{{ r.brechaTxt }}</span></td>
+                        <td class="mono" style="padding:11px 8px;text-align:right;color:#b54708;font-size:11px">{{ r.costoDef }}</td>
+                        <td style="padding:11px 8px">
+                          <div style="display:flex;align-items:center;gap:7px">
+                            <div style="width:46px;height:6px;background:#f1efe9;border-radius:3px;overflow:hidden"><div style="{{ r.scoreBar }}"></div></div>
+                            <span class="mono" style="font-size:11.5px;font-weight:600;color:{{ r.scoreColor }}">{{ r.score }}</span>
+                          </div>
+                        </td>
+                        <td style="padding:11px 22px;text-align:right"><button onClick="{{ r.onToggle }}" style="border:1px solid #e3d9fb;background:#faf7ff;color:#6d28d9;font-family:inherit;font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;cursor:pointer;white-space:nowrap">{{ r.toggleLabel }}</button></td>
+                      </tr>
+                      <sc-if value="{{ r.exp }}" hint-placeholder-val="{{ false }}">
+                        <tr style="background:#faf9f6"><td colspan="8" style="padding:0 22px 14px 38px"><div style="background:#fff;border:1px solid #ece3fb;border-left:3px solid #9b59f6;border-radius:9px;padding:12px 15px;font-size:12.5px;color:#41505c;line-height:1.5">{{ r.sugerencia }}</div></td></tr>
+                      </sc-if>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+              <div style="padding:12px 22px;font-size:10.5px;color:#9098a4;border-top:1px solid #f0eee8;line-height:1.45">Dotación actual por perfil = estimación de trabajo a calibrar con la nómina. Costo por cupo y multiplicadores provienen del Modelo de Costeo (Ley 21.796). Cifras orientativas para planificación.</div>
+            </div>
+          </div>
         </div>
       </div>
       </sc-if>
@@ -476,7 +689,7 @@
                   </div>
                   <div style="{{ p.nameStyle }}">{{ p.name }}</div>
                   <div style="font-size:12px;color:#7a828f;margin-top:5px">{{ p.motivo }}</div>
-                  <div style="margin-top:11px"><button onClick="{{ p.onToggle }}" style="{{ p.toggleStyle }}">{{ p.toggleLabel }}</button></div>
+                  <div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ p.onToggle }}" style="{{ p.toggleStyle }}">{{ p.toggleLabel }}</button><button onClick="{{ p.onAskAI }}" style="{{ p.aiToggleStyle }}">✨ Asesor normativo IA</button></div>
                 </div>
                 <div style="display:flex;gap:5px;flex:none">
                   <sc-for list="{{ p.statusBtns }}" as="b" hint-placeholder-count="3">
@@ -518,6 +731,57 @@
                   </sc-if>
                   <span style="font-size:11px;color:#9098a4">Se guarda en este navegador. Adjunta el PDF/Word de la nueva versión.</span>
                 </div>
+              </div>
+              </sc-if>
+              <sc-if value="{{ p.aiOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="background:linear-gradient(180deg,#faf8ff,#f6f3fc);border-top:1px solid #ece3fb;padding:16px 18px 18px 96px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                  <span style="font-size:11px;letter-spacing:.5px;color:#6d28d9;font-weight:700">✨ ASESOR NORMATIVO (IA)</span>
+                  <span style="font-size:11px;color:#9b8fc4">Sugerencias para elaborar/actualizar este procedimiento</span>
+                </div>
+                <sc-if value="{{ p.aiLoad }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:10px;color:#6d28d9;font-size:13px;padding:8px 0"><span style="width:14px;height:14px;border:2px solid #d8c9f7;border-top-color:#6d28d9;border-radius:50%;display:inline-block;animation:aispin .7s linear infinite"></span>Analizando la materia y buscando normativa aplicable…</div>
+                </sc-if>
+                <sc-if value="{{ p.hasAiErr }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#fff4f4;border:1px solid #f3d2d2;border-radius:9px;padding:12px 14px;font-size:12.5px;color:#a13a3a;line-height:1.45">{{ p.aiErr }} <button onClick="{{ p.onRetryAI }}" style="margin-left:6px;border:none;background:transparent;color:#6d28d9;font-weight:600;cursor:pointer;font-family:inherit;font-size:12.5px">Reintentar</button></div>
+                </sc-if>
+                <sc-if value="{{ p.hasAiRes }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:14px">
+                  <div style="background:#fff;border:1px solid #ece3fb;border-radius:11px;padding:14px 16px">
+                    <div style="font-size:11px;font-weight:700;color:#6d28d9;letter-spacing:.3px;margin-bottom:9px">ENFOQUE SUGERIDO</div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ p.aiEnfoque }}" as="e" hint-placeholder-count="3">
+                        <div style="display:flex;gap:8px;font-size:12.5px;color:#2b333f;line-height:1.4"><span style="color:#9b59f6;flex:none">→</span><span>{{ e }}</span></div>
+                      </sc-for>
+                    </div>
+                    <div style="font-size:11px;font-weight:700;color:#b42318;letter-spacing:.3px;margin:14px 0 9px">RIESGOS / OBSERVACIONES</div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ p.aiRiesgos }}" as="r" hint-placeholder-count="2">
+                        <div style="display:flex;gap:8px;font-size:12.5px;color:#7a3b3b;line-height:1.4"><span style="flex:none">⚠</span><span>{{ r }}</span></div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="background:#fff;border:1px solid #ece3fb;border-radius:11px;padding:14px 16px">
+                    <div style="font-size:11px;font-weight:700;color:#0e7490;letter-spacing:.3px;margin-bottom:11px">NORMATIVA Y ARTÍCULOS APLICABLES</div>
+                    <div style="display:flex;flex-direction:column;gap:13px">
+                      <sc-for list="{{ p.aiNormativa }}" as="n" hint-placeholder-count="2">
+                        <div>
+                          <div style="font-size:12.5px;font-weight:700;color:#16202e;margin-bottom:6px">{{ n.ley }}</div>
+                          <div style="display:flex;flex-direction:column;gap:6px">
+                            <sc-for list="{{ n.articulos }}" as="a" hint-placeholder-count="2">
+                              <div style="display:flex;gap:9px;background:#f3faf9;border-radius:7px;padding:7px 10px">
+                                <span class="mono" style="font-size:11px;font-weight:600;color:#0e7490;flex:none;white-space:nowrap">{{ a.art }}</span>
+                                <span style="font-size:12px;color:#41505c;line-height:1.4">{{ a.detalle }}</span>
+                              </div>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size:11px;color:#9b8fc4;margin-top:11px;line-height:1.4">Sugerencias generadas por IA con fines orientativos. Verifica siempre la vigencia y el texto oficial de cada norma antes de citarla.</div>
+                </sc-if>
               </div>
               </sc-if>
             </div>
@@ -599,7 +863,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { view:'resumen', sort:'real', vacRegion:'all', vacImpact:'all', vacVia:'all', area:'do', segH:'all', procPrio:'all', track:null, filled:null, procSt:null, procExp:null, procLog:null, draft:{} };
+  state = { view:'resumen', sort:'real', vacRegion:'all', vacImpact:'all', vacVia:'all', area:'do', segH:'all', procPrio:'all', track:null, filled:null, procSt:null, procExp:null, procLog:null, draft:{}, aiExp:null, aiLoad:{}, aiRes:{}, aiErr:{}, opt:null, optExp:null, orgSel:'central', orgNode:null };
 
   componentDidMount(){
     let t={},f={},p={},l={};
@@ -607,8 +871,17 @@ class Component extends DCLogic {
     try{ const s=localStorage.getItem('fosis_filled'); if(s) f=JSON.parse(s); }catch(e){}
     try{ const s=localStorage.getItem('fosis_proc'); if(s) p=JSON.parse(s); }catch(e){}
     try{ const s=localStorage.getItem('fosis_proc_log'); if(s) l=JSON.parse(s); }catch(e){}
-    this.setState({track:{...this.defaultTrack(),...t},filled:f,procSt:p,procLog:l});
+    let o={};
+    try{ const s=localStorage.getItem('fosis_opt'); if(s) o=JSON.parse(s); }catch(e){}
+    this.setState({track:{...this.defaultTrack(),...t},filled:f,procSt:p,procLog:l,opt:{...this.optParamsDef(),...o}});
   }
+  setOpt(key,val){
+    const cur={...(this.state.opt||this.optParamsDef()),[key]:val};
+    try{ localStorage.setItem('fosis_opt',JSON.stringify(cur)); }catch(e){}
+    this.setState({opt:cur});
+  }
+  resetOpt(){ try{localStorage.setItem('fosis_opt','{}');}catch(e){} this.setState({opt:this.optParamsDef()}); }
+  toggleOptExp(name){ this.setState(s=>({optExp:s.optExp===name?null:name})); }
   idb(){
     if(this._idb) return this._idb;
     this._idb=new Promise((res,rej)=>{
@@ -632,6 +905,27 @@ class Component extends DCLogic {
   }
   clearDraftFile(id){ this.setState(s=>{const d={...s.draft};delete d[id+'_file'];return {draft:d};}); }
   toggleProcExp(id){ this.setState(s=>({procExp:s.procExp===id?null:id})); }
+  toggleAI(proc){
+    const open=this.state.aiExp===proc.id;
+    this.setState({aiExp:open?null:proc.id});
+    if(!open && !(this.state.aiRes||{})[proc.id] && !(this.state.aiLoad||{})[proc.id]) this.runAI(proc);
+  }
+  async runAI(proc){
+    this.setState(s=>({aiLoad:{...s.aiLoad,[proc.id]:true},aiErr:{...s.aiErr,[proc.id]:null}}));
+    try{
+      if(!(window.claude&&window.claude.complete)) throw new Error('La asistencia con IA está disponible al abrir el dashboard dentro del editor (no en la página publicada de GitHub).');
+      const prompt='Eres un asesor normativo experto en derecho administrativo chileno y en gestión de personas del sector público (FOSIS, Estatuto Administrativo, Ley Karin, normativa de la Dirección Nacional del Servicio Civil y Contraloría). Para el siguiente procedimiento institucional, entrega orientación para elaborarlo o actualizarlo.\n\nProcedimiento: "'+proc.name+'"\nÁrea: '+proc.area+'\nMateria / objeto: '+proc.motivo+'\n\nResponde ÚNICAMENTE con un JSON válido (sin texto adicional, sin markdown) con esta estructura exacta:\n{"enfoque":["punto de enfoque 1","punto 2"],"normativa":[{"ley":"Nombre y número de la ley o norma","articulos":[{"art":"Art. N°","detalle":"qué regula y por qué aplica"}]}],"riesgos":["riesgo u observación 1"]}\nMáximo 4 puntos de enfoque, 3 normas, 3 artículos por norma y 3 riesgos. Todo en español de Chile. Si no estás seguro de un número de artículo, indícalo en el detalle.';
+      const raw=await window.claude.complete({messages:[{role:'user',content:prompt}]});
+      let data=null;
+      try{ data=JSON.parse(raw); }catch(e){
+        const m=raw&&raw.match(/\{[\s\S]*\}/); if(m){ try{ data=JSON.parse(m[0]); }catch(e2){} }
+      }
+      if(!data||!data.enfoque) throw new Error('No se pudo interpretar la respuesta. Intenta de nuevo.');
+      this.setState(s=>({aiRes:{...s.aiRes,[proc.id]:data},aiLoad:{...s.aiLoad,[proc.id]:false}}));
+    }catch(err){
+      this.setState(s=>({aiErr:{...s.aiErr,[proc.id]:err.message||'Error al consultar la IA.'},aiLoad:{...s.aiLoad,[proc.id]:false}}));
+    }
+  }
   setDraft(id,field,val){ this.setState(s=>({draft:{...s.draft,[id+'_'+field]:val}})); }
   async addProcUpdate(id){
     const ver=(this.state.draft[id+'_ver']||'').trim();
@@ -664,23 +958,113 @@ class Component extends DCLogic {
     try{ localStorage.setItem('fosis_proc',JSON.stringify(cur)); }catch(e){}
     this.setState({procSt:cur});
   }
+  // ===== ORGANIGRAMA INTERACTIVO =====
+  orgUnits(){
+    // key, label, total, directorVacante(bool)
+    const u=this.units();
+    const list=[{key:'central',label:'Nivel Central',total:159,dirVac:true,tipo:'central'}];
+    u.filter(x=>x.short!=='Dirección Nacional').forEach(x=>{
+      list.push({key:x.short,label:x.short,total:x.real,dirVac:x.vcrit>=1&&x.vac>=1,tipo:'region'});
+    });
+    return list;
+  }
+  orgData(key){
+    if(key==='central'){
+      const subs=this.nivelCentral();
+      const nodes=[
+        {id:'de',lvl:0,parent:null,cargo:'Director/a Ejecutivo/a',area:'Dirección Ejecutiva',grado:'1C',estado:'vacante',dep:'Nivel central · Subsecretaría de Servicios Sociales',n:23,
+         func:'Conduce estratégicamente el Servicio, representa institucionalmente al FOSIS y articula con la autoridad. Provisión vía Alta Dirección Pública (ADP).'},
+      ];
+      subs.forEach((s,i)=>{
+        const id='s'+i;
+        nodes.push({id,lvl:1,parent:'de',cargo:'Jefatura — '+s.name,area:s.name,grado:s.code.includes('Fiscal')?'Fiscal':'3-5',estado:i===5?'vacante':'provisto',dep:'Depende de Dirección Ejecutiva',n:s.total,
+          func:'Conduce la '+s.name+'. Responsable de la gestión y resultados de sus '+s.depts.length+' unidades ('+s.total+' funcionarios).'});
+        s.depts.forEach((d,j)=>{
+          nodes.push({id:id+'_'+j,lvl:2,parent:id,cargo:d[0],area:s.name,grado:'—',estado:'provisto',dep:'Depende de '+s.name,n:d[1],
+            func:'Unidad operativa de '+s.name+'. Dotación: '+d[1]+' personas.'});
+        });
+      });
+      return {title:'Dirección Nacional · Nivel Central',subtitle:'6 subdirecciones · 30 unidades · 159 funcionarios',nodes};
+    }
+    // ----- región genérica -----
+    const u=this.units().find(x=>x.short===key)||{short:key,real:0,vac:0};
+    const region=u.short, total=u.real;
+    const dv=u.vac>=1;
+    // reparto aproximado por área
+    const prog=Math.round(total*0.55), admin=Math.round(total*0.22), eje=Math.round(total*0.13);
+    const personas=Math.max(2,Math.round(total*0.05)), juridica=Math.max(1,Math.round(total*0.03));
+    const nodes=[
+      {id:'dr',lvl:0,parent:null,cargo:'Director/a Regional',area:'Dirección Regional '+region,grado:'4',estado:dv?'vacante':'provisto',dep:'Depende de la Dirección Ejecutiva (Nivel Central)',n:total,
+       func:'Máxima autoridad regional del FOSIS. Conduce la ejecución de programas en la región, representa al Servicio ante el GORE y articula la oferta territorial. '+(dv?'Función ejercida vía funciones directivas (Ley 21.796); por regularizar.':'Cargo provisto.')},
+      {id:'gp',lvl:1,parent:'dr',cargo:'Depto. Gestión de Programas',area:'Programas',grado:'12',estado:'provisto',dep:'Depende de la Dirección Regional',n:prog,
+       func:'Coordina la implementación de los programas sociales en la región (Familias, Emprendimiento, Habitabilidad). Núcleo operativo regional.'},
+      {id:'af',lvl:1,parent:'dr',cargo:'Unidad de Administración y Finanzas',area:'Administración',grado:'12',estado:'provisto',dep:'Depende de la Dirección Regional',n:admin,
+       func:'Gestiona presupuesto regional, adquisiciones, rendiciones, servicios generales y soporte administrativo.'},
+      {id:'per',lvl:1,parent:'dr',cargo:'Encargado/a de Personas Regional',area:'Personas',grado:'10-12',estado:'provisto',dep:'Depende de la Dirección Regional',n:personas,
+       func:'Gestión de personas en la región: bienestar, clima, capacitación y aplicación de la Ley Karin a nivel regional.'},
+      {id:'cg',lvl:1,parent:'dr',cargo:'Control de Gestión Regional',area:'Control de Gestión',grado:'12',estado:'provisto',dep:'Depende de la Dirección Regional',n:Math.max(1,Math.round(total*0.02)),
+       func:'Monitorea indicadores, metas y cumplimiento regional. Reporta avance al Nivel Central.'},
+      {id:'jur',lvl:1,parent:'dr',cargo:'Asesoría Jurídica Regional',area:'Jurídica',grado:'8-11',estado:'provisto',dep:'Depende de la Dirección Regional',n:juridica,
+       func:'Defensa jurídica regional, convenios, sumarios e investigaciones (incl. Ley Karin).'},
+      {id:'adl',lvl:2,parent:'gp',cargo:'Agentes de Desarrollo Local',area:'Programas',grado:'12-19',estado:'provisto',dep:'Depende de Gestión de Programas',n:Math.round(prog*0.45),
+       func:'Ejecutan en terreno el acompañamiento a usuarios y comunidades. Cara visible del FOSIS en el territorio.'},
+      {id:'gf',lvl:2,parent:'gp',cargo:'Gestores Familiares Programa EJE',area:'Programas',grado:'17-18',estado:'provisto',dep:'Depende de Gestión de Programas',n:Math.round(prog*0.35),
+       func:'Acompañan a familias en el programa Eje (Seguridades y Oportunidades). Perfil de mayor carga del país.'},
+      {id:'app',lvl:2,parent:'gp',cargo:'Apoyo Provincial SSyOO',area:'Programas',grado:'16-17',estado:'provisto',dep:'Depende de Gestión de Programas',n:Math.round(prog*0.20),
+       func:'Soporte provincial a la ejecución de programas Seguridades y Oportunidades.'},
+    ];
+    return {title:'Dirección Regional de '+region,subtitle:total+' funcionarios · '+(dv?'Dirección por regularizar':'Dirección provista'),nodes};
+  }
+  orgEstadoMeta(e){ return ({provisto:{label:'Provisto',bg:'#e7f6ee',tx:'#0f7a4f',dot:'#0f8378'},vacante:{label:'Vacante / por regularizar',bg:'#fef3f2',tx:'#b42318',dot:'#d92d20'}})[e]; }
+
+  // ===== MODELO DOTACIÓN ÓPTIMA =====
+  // Costo institucional por cupo (miles $/año) = Subt.21 total / dotación máx. 971  (Ley 21.796)
+  optParamsDef(){ return { costo:29508, objetivo:100, wCarga:50, wVac:30, wCrit:20 }; }
+  optMult(){ return {Conducción:1.8,Jefatura:1.4,Soporte:1.0,Ejecutor:0.8}; }
+  optProfiles(){
+    // [perfil, categoría, grados, dotación actual (estim.), vacantes, cargaBase%, cobertura%, criticidadFuncional(0-100), estadoC12, nota]
+    return [
+      ['Director/a Regional','Conducción','4',16,16,115,90,100,'regularizar','Función ya ejercida vía funciones directivas (Ley 21.796); costo incremental $0. Regularizar registro nominal.'],
+      ['Director/a Ejecutivo/a','Conducción','1C',1,1,110,85,100,'regularizar','Provisión vía ADP. Costo incremental $0 (función ejercida).'],
+      ['Subdirector/a','Conducción','3',6,1,108,88,95,'proveer','Provisión vía ADP / concurso. Clave para conducción estratégica.'],
+      ['Jefe/a de Departamento','Jefatura','5-8',25,4,112,82,88,'proveer','Concurso interno. Sostiene la línea de supervisión de los departamentos.'],
+      ['Encargado/a Regional de Programas','Jefatura','12',16,3,118,78,85,'proveer','Sobrecarga por déficit de ejecutores aguas abajo. Priorizar regiones con mayor brecha.'],
+      ['Encargado/a de Personas Regional','Jefatura','10-12',16,2,120,75,82,'proceso','Crítico para clima y Ley Karin. Ñuble en proceso (cierre jul-2026).'],
+      ['Encargado/a de Control de Gestión','Jefatura','12',16,2,108,84,70,'proveer','Provisión T4-2026 vía Circular N°12 (art. 7d / convenio).'],
+      ['Profesional de Programa','Soporte','11-13',180,8,106,86,55,'proveer','Núcleo profesional. Distribuir carga según cobertura regional.'],
+      ['Profesional TICs / Sistemas','Soporte','12-14',25,3,126,70,75,'proveer','Brecha digital y ciberseguridad. Alta criticidad técnica.'],
+      ['Analista Jurídico / Contable','Soporte','10-16',60,5,102,88,60,'proveer','Soporte transversal. Calibrar con carga de rendiciones.'],
+      ['Asesor/a Jurídico Regional','Soporte','8-11',20,2,110,80,72,'proveer','Sostiene defensa jurídica regional y sumarios Ley Karin.'],
+      ['Asistente Administrativo','Soporte','15-18',120,6,96,92,40,'suspendida','Suspendida por Circular N°12; reevaluar post-restricción o vía convenio.'],
+      ['Agente de Desarrollo Local','Ejecutor','12-19',140,4,122,72,65,'suspendida','Ejecutor territorial. Condicionada a levantamiento C.12 o convenio de programa.'],
+      ['Gestor/a Familiar Programa EJE','Ejecutor','17-18',110,5,128,68,68,'proveer','Mayor sobrecarga del país. Máximo impacto por peso gastado (déficit Ñuble, Aysén, Los Ríos).'],
+      ['Apoyo Provincial SSyOO','Ejecutor','16-17',90,4,118,74,58,'proveer','Cobertura provincial. Evaluar movilidad interna (Araucanía→Los Lagos).'],
+    ];
+  }
+  optC12Meta(k){ return ({
+    regularizar:{label:'Por regularizar',bg:'#eef6ff',tx:'#175cd3'},
+    proveer:{label:'Por proveer',bg:'#fffaeb',tx:'#b54708'},
+    proceso:{label:'En proceso',bg:'#fff7ed',tx:'#c2620e'},
+    suspendida:{label:'Suspendida (C.12)',bg:'#fef3f2',tx:'#b42318'},
+  })[k]; }
+
   procedures(){return [
-    [1,'PR-GDP-6.1-01','Requisición de Personal','Reclutamiento y Selección','Solicitud y autorización de vacantes','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_requisicion_personal.pdf'],
-    [2,'PR-GDP-6.1-02','Reclutamiento y Selección contrata y honorarios','Reclutamiento y Selección','Proceso de selección','baja','actualizado','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_reclutamiento_contrata.pdf'],
-    [3,'PR-GDP-6.1-03','Concursos de Planta','Reclutamiento y Selección','Concursos de ingreso, promoción y ADP','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_concursos_planta.pdf'],
-    [4,'PR-GDP-6.2.1-01','Movilidad Interna','Reclutamiento y Selección','Provisión interna de cargos','baja','actualizado','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_movilidad_interna.pdf'],
-    [5,'PR-GDP-6.2.2-02','Inducción, Reinducción y Movilidad Interna','Inducción','Inducción, reinducción y movilidad','baja','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_induccion_2026.docx'],
-    [6,'FC-P-00047','Estrategia Formación Trienal y Plan Anual de Capacitación','Capacitación','Plan anual de capacitación','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/estrategia_capacitacion_2026.pdf'],
-    [7,'PR-GDP-6.2.2-07','Ejecución de las Actividades de Capacitación','Capacitación','Ejecución del Plan Anual de Capacitación','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_ejecucion_capacitacion.pdf'],
-    [8,'PR-GDP-6.2.2-08','Evaluación Eficacia / Transferencia de la Capacitación','Capacitación','Evaluación de eficacia y transferencia','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_evaluacion_capacitacion.pdf'],
-    [9,'PR-GDP-6.2.2-05','Gestión del Desempeño y Calificación Anual','Evaluación de Desempeño','Gestión del desempeño y calificación','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_evaluacion_desempeno_v8.pdf'],
-    [10,'PR-GDP-6.2.2-01','Creación y Actualización de Estructuras y Perfiles de Cargo','Estructura Organizacional','Organigramas y perfiles de cargo','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_estructura_perfiles.pdf'],
-    [11,'FC-P-00307','Política de Reconocimiento Personas Funcionarias','Reconocimiento','Reconocimiento a funcionarios/as','baja','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_reconocimiento.pdf'],
-    [12,'FC-P-00480','Denuncia ante Acoso Sexual, Laboral y Violencia en el Trabajo','Calidad de Vida','Prevención de acoso y violencia laboral','alta','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_denuncia_acoso.pdf'],
-    [13,'FC-P-00599','Política de Inclusión y Diversidad','Calidad de Vida','Inclusión laboral (Ley 21.015)','media','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_inclusion.pdf'],
-    [14,'FC-F-00631','Protocolo de Inclusión Laboral y Diversidad','Calidad de Vida','Actualiza protocolo de inclusión','media','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/protocolo_inclusion.pdf'],
-    [15,'RES. EX. 0228','Política de Gestión y Desarrollo de Personas','Transversal','Marco transversal a todas las áreas','media','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_gestion_personas.pdf'],
-    [16,'RES. EX. 0229','Política de Compensaciones','Transversal','Marco de compensaciones','media','pendiente','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_compensaciones.pdf'],
+    [1,'PR-GDP-6.1-01','Requisición de Personal','Reclutamiento y Selección','Solicitud y autorización de vacantes','alta','pendiente','docs/proc_requisicion_personal.pdf'],
+    [2,'PR-GDP-6.1-02','Reclutamiento y Selección contrata y honorarios','Reclutamiento y Selección','Proceso de selección','baja','actualizado','docs/proc_reclutamiento_contrata.pdf'],
+    [3,'PR-GDP-6.1-03','Concursos de Planta','Reclutamiento y Selección','Concursos de ingreso, promoción y ADP','alta','pendiente','docs/proc_concursos_planta.pdf'],
+    [4,'PR-GDP-6.2.1-01','Movilidad Interna','Reclutamiento y Selección','Provisión interna de cargos','baja','actualizado','docs/proc_movilidad_interna.pdf'],
+    [5,'PR-GDP-6.2.2-02','Inducción, Reinducción y Movilidad Interna','Inducción','Inducción, reinducción y movilidad','baja','pendiente','docs/proc_induccion_2026.docx'],
+    [6,'FC-P-00047','Estrategia Formación Trienal y Plan Anual de Capacitación','Capacitación','Plan anual de capacitación','alta','pendiente','docs/estrategia_capacitacion_2026.pdf'],
+    [7,'PR-GDP-6.2.2-07','Ejecución de las Actividades de Capacitación','Capacitación','Ejecución del Plan Anual de Capacitación','alta','pendiente','docs/proc_ejecucion_capacitacion.pdf'],
+    [8,'PR-GDP-6.2.2-08','Evaluación Eficacia / Transferencia de la Capacitación','Capacitación','Evaluación de eficacia y transferencia','alta','pendiente','docs/proc_evaluacion_capacitacion.pdf'],
+    [9,'PR-GDP-6.2.2-05','Gestión del Desempeño y Calificación Anual','Evaluación de Desempeño','Gestión del desempeño y calificación','alta','pendiente','docs/proc_evaluacion_desempeno_v8.pdf'],
+    [10,'PR-GDP-6.2.2-01','Creación y Actualización de Estructuras y Perfiles de Cargo','Estructura Organizacional','Organigramas y perfiles de cargo','alta','pendiente','docs/proc_estructura_perfiles.pdf'],
+    [11,'FC-P-00307','Política de Reconocimiento Personas Funcionarias','Reconocimiento','Reconocimiento a funcionarios/as','baja','pendiente','docs/politica_reconocimiento.pdf'],
+    [12,'FC-P-00480','Denuncia ante Acoso Sexual, Laboral y Violencia en el Trabajo','Calidad de Vida','Prevención de acoso y violencia laboral','alta','pendiente','docs/proc_denuncia_acoso.pdf'],
+    [13,'FC-P-00599','Política de Inclusión y Diversidad','Calidad de Vida','Inclusión laboral (Ley 21.015)','media','pendiente','docs/politica_inclusion.pdf'],
+    [14,'FC-F-00631','Protocolo de Inclusión Laboral y Diversidad','Calidad de Vida','Actualiza protocolo de inclusión','media','pendiente','docs/protocolo_inclusion.pdf'],
+    [15,'RES. EX. 0228','Política de Gestión y Desarrollo de Personas','Transversal','Marco transversal a todas las áreas','media','pendiente','docs/politica_gestion_personas.pdf'],
+    [16,'RES. EX. 0229','Política de Compensaciones','Transversal','Marco de compensaciones','media','pendiente','docs/politica_compensaciones.pdf'],
   ];}
   defaultProc(){const o={};this.procedures().forEach(p=>o[p[0]]=p[6]);return o;}
   procStatusOf(id){const s=this.state.procSt||{};return s[id]||this.defaultProc()[id];}
@@ -826,30 +1210,30 @@ class Component extends DCLogic {
     const D=(name,tag,file)=>({name,tag,file});
     return [
       {id:'do',label:'Desarrollo Organizacional',color:'#0f8378',count:78,desc:'Capacitación, selección, perfiles, integridad, desempeño y normativa interna de personas.',subs:[
-        {name:'Estructura y Dotación',count:9,docs:[D('Dashboard Dotación FOSIS 2026','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/dashboard_dotacion.xlsx'),D('Matriz Nacional Diagnóstico 2026','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/matriz_nacional.xlsx'),D('Nómina actualizada de funcionarios','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/nomina_funcionarios.xlsx'),D('Metodología de cálculo de dotación','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/metodologia_calculo.docx'),D('Informe Integral DO 2026','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/informe_integral_do.docx')]},
-        {name:'Reclutamiento y Selección',count:6,docs:[D('Plataforma de Reclutamiento y Selección FOSIS','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/plataforma_reclutamiento.docx'),D('Procedimiento Movilidad Interna FOSIS','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_movilidad_interna.pdf')]},
-        {name:'Capacitación',count:16,docs:[D('Estrategia y Plan de Capacitación 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/estrategia_capacitacion_2026.pdf'),D('Planilla PAC 2026 Desarrollo Org.','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/planilla_pac_2026.xlsx'),D('Cronograma de capacitaciones FOSIS','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/cronograma_capacitaciones.xlsx')]},
-        {name:'Evaluación del Desempeño',count:9,docs:[D('Procedimiento Evaluación del Desempeño V8','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_evaluacion_desempeno_v8.pdf'),D('REX CGR · Reclamos calificaciones 2025','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/rex_cgr_reclamos_2025.pdf')]},
-        {name:'Comité de Integridad',count:10,docs:[D('RESEX FC-F-00019 Comité de Integridad 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/resex_comite_integridad_2026.pdf'),D('Código de Ética FOSIS','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/codigo_etica.pdf'),D('Minuta Mesa de Integridad 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/minuta_integridad_2026.pdf')]},
-        {name:'Planificación DO',count:9,docs:[D('Plan DO 2026','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/plan_do_2026.xlsx'),D('Política de Gestión y Desarrollo de Personas','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_gestion_personas.pdf')]},
-        {name:'Normativa y Procedimientos',count:12,docs:[D('Procedimiento Denuncia Acoso Laboral/Sexual','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_denuncia_acoso.pdf'),D('Ley 21.643 — Ley Karin','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/ley_karin_21643.pdf'),D('Protocolo Prevención de Conflictos Laborales','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/protocolo_conflictos.pdf')]},
-        {name:'Inducción y Reconocimiento',count:7,docs:[D('Procedimiento de Inducción 2026','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_induccion_2026.docx'),D('FC-P-00277 Procedimiento de Anotaciones','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_anotaciones.pdf')]},
+        {name:'Estructura y Dotación',count:9,docs:[D('Dashboard Dotación FOSIS 2026','XLS','docs/dashboard_dotacion.xlsx'),D('Matriz Nacional Diagnóstico 2026','XLS','docs/matriz_nacional.xlsx'),D('Nómina actualizada de funcionarios','XLS','docs/nomina_funcionarios.xlsx'),D('Metodología de cálculo de dotación','DOC','docs/metodologia_calculo.docx'),D('Informe Integral DO 2026','DOC','docs/informe_integral_do.docx')]},
+        {name:'Reclutamiento y Selección',count:6,docs:[D('Plataforma de Reclutamiento y Selección FOSIS','DOC','docs/plataforma_reclutamiento.docx'),D('Procedimiento Movilidad Interna FOSIS','PDF','docs/proc_movilidad_interna.pdf')]},
+        {name:'Capacitación',count:16,docs:[D('Estrategia y Plan de Capacitación 2026','PDF','docs/estrategia_capacitacion_2026.pdf'),D('Planilla PAC 2026 Desarrollo Org.','XLS','docs/planilla_pac_2026.xlsx'),D('Cronograma de capacitaciones FOSIS','XLS','docs/cronograma_capacitaciones.xlsx')]},
+        {name:'Evaluación del Desempeño',count:9,docs:[D('Procedimiento Evaluación del Desempeño V8','PDF','docs/proc_evaluacion_desempeno_v8.pdf'),D('REX CGR · Reclamos calificaciones 2025','PDF','docs/rex_cgr_reclamos_2025.pdf')]},
+        {name:'Comité de Integridad',count:10,docs:[D('RESEX FC-F-00019 Comité de Integridad 2026','PDF','docs/resex_comite_integridad_2026.pdf'),D('Código de Ética FOSIS','PDF','docs/codigo_etica.pdf'),D('Minuta Mesa de Integridad 2026','PDF','docs/minuta_integridad_2026.pdf')]},
+        {name:'Planificación DO',count:9,docs:[D('Plan DO 2026','XLS','docs/plan_do_2026.xlsx'),D('Política de Gestión y Desarrollo de Personas','PDF','docs/politica_gestion_personas.pdf')]},
+        {name:'Normativa y Procedimientos',count:12,docs:[D('Procedimiento Denuncia Acoso Laboral/Sexual','PDF','docs/proc_denuncia_acoso.pdf'),D('Ley 21.643 — Ley Karin','PDF','docs/ley_karin_21643.pdf'),D('Protocolo Prevención de Conflictos Laborales','PDF','docs/protocolo_conflictos.pdf')]},
+        {name:'Inducción y Reconocimiento',count:7,docs:[D('Procedimiento de Inducción 2026','DOC','docs/proc_induccion_2026.docx'),D('FC-P-00277 Procedimiento de Anotaciones','PDF','docs/proc_anotaciones.pdf')]},
       ]},
       {id:'cv',label:'Calidad de Vida y Ambientes Laborales',color:'#7c3aed',count:34,desc:'Teletrabajo, denuncias laborales, calidad de vida, inclusión y atención temprana psicológica.',subs:[
-        {name:'Teletrabajo y Trabajo Remoto',count:11,docs:[D('0136 Procedimiento Teletrabajo Funcionarios 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_teletrabajo_2026.pdf'),D('Convenio Trabajo Remoto 2026','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/convenio_trabajo_remoto.docx')]},
-        {name:'Denuncias Laborales',count:12,docs:[D('Formulario de denuncia FOSIS','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/formulario_denuncia.pdf')]},
-        {name:'Programa Calidad de Vida',count:2,docs:[D('FC-P-00133 Programa Calidad de Vida 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/programa_calidad_vida_2026.pdf'),D('Plan Calidad de Vida FOSIS 2026','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/plan_calidad_vida_2026.pdf')]},
-        {name:'Inclusión y Diversidad',count:3,docs:[D('Política de Inclusión y Diversidad','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_inclusion.pdf'),D('Protocolo de Inclusión Laboral','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/protocolo_inclusion.pdf')]},
+        {name:'Teletrabajo y Trabajo Remoto',count:11,docs:[D('0136 Procedimiento Teletrabajo Funcionarios 2026','PDF','docs/proc_teletrabajo_2026.pdf'),D('Convenio Trabajo Remoto 2026','DOC','docs/convenio_trabajo_remoto.docx')]},
+        {name:'Denuncias Laborales',count:12,docs:[D('Formulario de denuncia FOSIS','PDF','docs/formulario_denuncia.pdf')]},
+        {name:'Programa Calidad de Vida',count:2,docs:[D('FC-P-00133 Programa Calidad de Vida 2026','PDF','docs/programa_calidad_vida_2026.pdf'),D('Plan Calidad de Vida FOSIS 2026','PDF','docs/plan_calidad_vida_2026.pdf')]},
+        {name:'Inclusión y Diversidad',count:3,docs:[D('Política de Inclusión y Diversidad','PDF','docs/politica_inclusion.pdf'),D('Protocolo de Inclusión Laboral','PDF','docs/protocolo_inclusion.pdf')]},
       ]},
       {id:'proc',label:'Procedimientos DO (vigentes)',color:'#0e7490',count:29,desc:'Políticas y procedimientos institucionales aprobados por resolución.',subs:[
-        {name:'Políticas',count:5,docs:[D('Política de Gestión y Desarrollo de Personas','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_gestion_personas.pdf'),D('Política de Compensaciones','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/politica_compensaciones.pdf')]},
-        {name:'Procedimientos de personas',count:14,docs:[D('Reclutamiento y Selección Contrata y Honorarios','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_reclutamiento_contrata.pdf'),D('Contratación cargos planta y contrata V6','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_contratacion_planta.pdf'),D('Evaluación del Desempeño V8','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_evaluacion_desempeno_v8.pdf'),D('Movilidad Interna FOSIS','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/proc_movilidad_interna.pdf')]},
+        {name:'Políticas',count:5,docs:[D('Política de Gestión y Desarrollo de Personas','PDF','docs/politica_gestion_personas.pdf'),D('Política de Compensaciones','PDF','docs/politica_compensaciones.pdf')]},
+        {name:'Procedimientos de personas',count:14,docs:[D('Reclutamiento y Selección Contrata y Honorarios','PDF','docs/proc_reclutamiento_contrata.pdf'),D('Contratación cargos planta y contrata V6','PDF','docs/proc_contratacion_planta.pdf'),D('Evaluación del Desempeño V8','PDF','docs/proc_evaluacion_desempeno_v8.pdf'),D('Movilidad Interna FOSIS','PDF','docs/proc_movilidad_interna.pdf')]},
       ]},
       {id:'karin',label:'Resoluciones Ley Karin',color:'#be123c',count:5,desc:'Investigaciones, sumarios y resoluciones asociadas a la Ley 21.643.',subs:[
-        {name:'Resoluciones e informes',count:5,docs:[D('0269 Aprueba informe y sobresee — Valparaíso','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/resex_0269_valparaiso.pdf'),D('0270 Aprueba informe y absuelve — O\u2019Higgins','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/resex_0270_ohiggins.pdf'),D('OF-85627 CGR Solicita informe','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/of_85627_cgr.pdf'),D('Informe Denuncias Ley Karin','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/informe_denuncias_karin.docx'),D('Reporte seguimiento VALS (abr 2026)','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/reporte_seguimiento_vals.xlsx')]},
+        {name:'Resoluciones e informes',count:5,docs:[D('0269 Aprueba informe y sobresee — Valparaíso','PDF','docs/resex_0269_valparaiso.pdf'),D('0270 Aprueba informe y absuelve — O\u2019Higgins','PDF','docs/resex_0270_ohiggins.pdf'),D('OF-85627 CGR Solicita informe','PDF','docs/of_85627_cgr.pdf'),D('Informe Denuncias Ley Karin','DOC','docs/informe_denuncias_karin.docx'),D('Reporte seguimiento VALS (abr 2026)','XLS','docs/reporte_seguimiento_vals.xlsx')]},
       ]},
       {id:'bt',label:'Señalética Buen Trato (ACHS)',color:'#b45309',count:12,desc:'Material gráfico de buen trato y ambientes laborales seguros.',subs:[
-        {name:'Señales',count:12,docs:[D('Espacio Seguro','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/bt_espacio_seguro.pdf'),D('Espacio Respetuoso','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/bt_espacio_respetuoso.pdf'),D('Violencia y Acoso','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/bt_violencia_acoso.pdf'),D('Canales Oficiales','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/bt_canales_oficiales.pdf'),D('Espacio Diverso','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/bt_espacio_diverso.pdf')]},
+        {name:'Señales',count:12,docs:[D('Espacio Seguro','PDF','docs/bt_espacio_seguro.pdf'),D('Espacio Respetuoso','PDF','docs/bt_espacio_respetuoso.pdf'),D('Violencia y Acoso','PDF','docs/bt_violencia_acoso.pdf'),D('Canales Oficiales','PDF','docs/bt_canales_oficiales.pdf'),D('Espacio Diverso','PDF','docs/bt_espacio_diverso.pdf')]},
       ]},
     ];
   }
@@ -917,7 +1301,8 @@ class Component extends DCLogic {
     // ---- nav ----
     const groups=[
       ['PANORAMA',[['resumen','◉','Resumen','']]],
-      ['DOTACIÓN ÓPTIMA',[['dotacion','▤','Dotación','1.039'],['central','◳','Nivel Central','159'],['vacantes','○','Vacantes',String(vTotalActive)]]],
+      ['DOTACIÓN ÓPTIMA',[['optimo','◎','Modelo Óptimo',''],['dotacion','▤','Dotación','1.039'],['central','◳','Nivel Central','159'],['vacantes','○','Vacantes',String(vTotalActive)]]],
+      ['ORGANIZACIÓN',[['organigrama','⌗','Organigrama','']]],
       ['RIESGO ORGANIZACIONAL',[['riesgo','◍','Clima & Denuncias','134']]],
       ['GESTIÓN',[['seguimiento','◇','Seguimiento','14'],['procedimientos','◫','Procedimientos',String(procPending)],['reportes','▥','Reportes',''],['documentos','▦','Documentos','157']]],
     ];
@@ -927,7 +1312,7 @@ class Component extends DCLogic {
       badgeStyle:`font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:20px;background:${v===it[0]?'rgba(255,255,255,.18)':'#28313f'};color:${v===it[0]?'#fff':'#7c8698'};${it[3]?'':'display:none'}`,
     }))}));
 
-    const titles={resumen:['Panorama general','Dotación, brechas y prioridades'],dotacion:['Plantilla actual','Dotación por unidad'],central:['Nivel Central','Organigrama y dotación por subdirección'],vacantes:['Vacantes activas','68 cargos por proveer'],riesgo:['Clima & Denuncias','Riesgo psicosocial CEAL y Ley Karin'],seguimiento:['Seguimiento','Hoja de ruta DO 2026-2027'],procedimientos:['Procedimientos','Actualización y nivel de urgencia'],reportes:['Reportes','Exportar datos e informes'],documentos:['Repositorio documental','Documentos por área de trabajo']};
+    const titles={resumen:['Panorama general','Dotación, brechas y prioridades'],optimo:['Modelo de Dotación Óptima','Carga, perfiles, presupuesto y Circular N°12'],dotacion:['Plantilla actual','Dotación por unidad'],central:['Nivel Central','Organigrama y dotación por subdirección'],organigrama:['Organigrama interactivo','Estructura por región y nivel central'],vacantes:['Vacantes activas','68 cargos por proveer'],riesgo:['Clima & Denuncias','Riesgo psicosocial CEAL y Ley Karin'],seguimiento:['Seguimiento','Hoja de ruta DO 2026-2027'],procedimientos:['Procedimientos','Actualización y nivel de urgencia'],reportes:['Reportes','Exportar datos e informes'],documentos:['Repositorio documental','Documentos por área de trabajo']};
     const t=titles[v];
 
     // ---- resumen ----
@@ -988,7 +1373,7 @@ class Component extends DCLogic {
     const tipologia=tipoRaw.map(x=>({label:x[0],count:x[1],pct:x[2],barStyle:`height:100%;width:${(x[1]/maxTipo*100).toFixed(0)}%;background:${x[3]};border-radius:4px`}));
     const hallazgos=[{t:'Araucanía:',d:'única región Riesgo Alto CEAL + 10 casos VALS + 54% carga. Triple correlación crítica.'},{t:'Ñuble:',d:'mayor carga de trabajo del país (68,8% en riesgo alto) por déficit estructural de dotación.'},{t:'Metropolitana:',d:'carga 55,6% + 13 denuncias — sobrecarga silenciosa en la región más grande.'},{t:'Patrón sistémico:',d:'regiones con carga >50% tienen tasa VALS promedio 17,2 vs 11,8 en regiones <35%.'}];
     const ktag=t=>{const m={PDF:['#fdecec','#c0392b'],DOC:['#e8eefc','#1d4ed8'],XLS:['#e7f6ee','#0f7a4f']};const c=m[t];return `font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 6px;border-radius:5px;flex:none;width:34px;text-align:center;background:${c[0]};color:${c[1]}`;};
-    const karinDocs=[['Informe Denuncias Ley Karin','DOC','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/informe_denuncias_karin.docx'],['Reporte seguimiento VALS (abr 2026)','XLS','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/reporte_seguimiento_vals.xlsx'],['Formulario de denuncia FOSIS','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/formulario_denuncia.pdf'],['Ley 21.643 — Ley Karin','PDF','Dashboard%20de%20dotaci%C3%B3n%20FOSIS/docs/ley_karin_21643.pdf']].map(d=>({name:d[0],tag:d[1],file:d[2],tagStyle:ktag(d[1])}));
+    const karinDocs=[['Informe Denuncias Ley Karin','DOC','docs/informe_denuncias_karin.docx'],['Reporte seguimiento VALS (abr 2026)','XLS','docs/reporte_seguimiento_vals.xlsx'],['Formulario de denuncia FOSIS','PDF','docs/formulario_denuncia.pdf'],['Ley 21.643 — Ley Karin','PDF','docs/ley_karin_21643.pdf']].map(d=>({name:d[0],tag:d[1],file:d[2],tagStyle:ktag(d[1])}));
 
     // ---- seguimiento ----
     const tr=this.state.track||this.defaultTrack();
@@ -1020,6 +1405,116 @@ class Component extends DCLogic {
       {fmt:'CSV',title:'Control de procedimientos',desc:'16 procedimientos · urgencia, estado y motivo.',onClick:()=>this.download('FOSIS_procedimientos.csv',this.csv([['Código','Procedimiento','Área','Motivo','Urgencia','Estado'],...allProc.map(p=>[p.code,p.name,p.area,p.motivo,({alta:'Alta',media:'Media',baja:'Baja'})[p.prio],({pendiente:'Pendiente',proceso:'En revisión',actualizado:'Actualizado'})[p.st]])]))},
     ];
 
+    // ---- organigrama interactivo ----
+    const orgSel=this.state.orgSel||'central';
+    const orgTabs=this.orgUnits().map(o=>({label:o.label,key:o.key,
+      onClick:()=>this.setState({orgSel:o.key,orgNode:null}),
+      style:`border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:${orgSel===o.key?700:500};padding:7px 13px;border-radius:8px;white-space:nowrap;background:${orgSel===o.key?'#16202e':'#fff'};color:${orgSel===o.key?'#fff':'#5b6573'};border:1px solid ${orgSel===o.key?'#16202e':'#e2e0d9'}`}));
+    const od=this.orgData(orgSel);
+    const selNode=this.state.orgNode||od.nodes[0].id;
+    const mkNode=(n)=>{
+      const em=this.orgEstadoMeta(n.estado);const on=selNode===n.id;
+      return {id:n.id,cargo:n.cargo,area:n.area,n:n.n,estado:n.estado,
+        onClick:()=>this.setState({orgNode:n.id}),
+        dotColor:em.dot,
+        boxStyle:`text-align:left;cursor:pointer;background:#fff;border:1.5px solid ${on?'#0f8378':'#e2e0d9'};border-top:3px solid ${em.dot};border-radius:10px;padding:11px 13px;min-width:170px;max-width:210px;box-shadow:${on?'0 4px 14px rgba(15,131,120,.18)':'0 1px 2px rgba(0,0,0,.05)'};font-family:inherit`,
+        cargoStyle:`font-size:12.5px;font-weight:700;color:#16202e;line-height:1.25`,
+        };
+    };
+    const root=od.nodes.find(n=>n.lvl===0);
+    const lvl1=od.nodes.filter(n=>n.lvl===1);
+    const lvl1Nodes=lvl1.map(n=>{
+      const children=od.nodes.filter(c=>c.parent===n.id);
+      return {...mkNode(n),children:children.map(mkNode)};
+    });
+    const detail=(()=>{ const n=od.nodes.find(x=>x.id===selNode)||root; const em=this.orgEstadoMeta(n.estado);
+      return {cargo:n.cargo,area:n.area,grado:n.grado,n:n.n,func:n.func,dep:n.dep,
+        estadoLabel:em.label,estadoStyle:`display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px;background:${em.bg};color:${em.tx}`,estadoDot:em.dot}; })();
+    const orgData={title:od.title,subtitle:od.subtitle,
+      root:mkNode(root),rootCargo:root.cargo,rootArea:root.area,rootN:root.n,
+      lvl1Nodes,detail};
+
+    // ---- modelo dotación óptima ----
+    const op=this.state.opt||this.optParamsDef();
+    const mult=this.optMult();
+    const wSum=(op.wCarga+op.wVac+op.wCrit)||1;
+    const catColor={Conducción:'#d92d20',Jefatura:'#f79009',Soporte:'#2e90fa',Ejecutor:'#0f8378'};
+    const fmtMM=n=>{ const m=n/1000; return (m>=1000?(m/1000).toFixed(2)+' MM':Math.round(m)+' M'); }; // miles$ -> M/MM CLP
+    const clp=n=>'$'+Math.round(n).toLocaleString('es-CL');
+    const optRows=this.optProfiles().map(p=>{
+      const [perfil,cat,grados,dot,vac,cargaBase,cobertura,critF,c12,nota]=p;
+      // índice de carga ponderado (0-130+): combina carga base, presión de vacancia y criticidad funcional
+      const vacPress=dot>0?Math.min(100+ (vac/dot)*100, 160):100;
+      const idxCarga=(cargaBase*op.wCarga + vacPress*op.wVac + (60+critF*0.6)*op.wCrit)/wSum;
+      const optima=Math.round(dot*(idxCarga/op.objetivo));
+      const brecha=optima-dot; // + = déficit (falta gente)
+      const costoUnit=op.costo*(mult[cat]||1);
+      const costoDeficit=Math.max(brecha,0)*costoUnit; // miles$/año
+      // score criticidad 0-100
+      const score=Math.round(Math.min(100, (idxCarga-80)*1.3 + critF*0.4 + (vac/Math.max(dot,1))*60 ));
+      return {perfil,cat,grados,dot,vac,c12,nota,catColor:catColor[cat],
+        idxCarga:Math.round(idxCarga),optima,brecha,costoUnit,costoDeficit,
+        score:Math.max(0,score) };
+    });
+    optRows.sort((a,b)=>b.score-a.score);
+    const totalDot=optRows.reduce((s,r)=>s+r.dot,0);
+    const totalOpt=optRows.reduce((s,r)=>s+r.optima,0);
+    const totalDef=optRows.reduce((s,r)=>s+Math.max(r.brecha,0),0);
+    const totalSup=optRows.reduce((s,r)=>s+Math.max(-r.brecha,0),0);
+    const totalCostoDef=optRows.reduce((s,r)=>s+r.costoDeficit,0); // miles$/año
+    const holguraCupos=71; const costoProm=op.costo; const holguraPesos=holguraCupos*costoProm;
+    const cabe=totalDef<=holguraCupos;
+    const optExp=this.state.optExp;
+    const optList=optRows.map(r=>{
+      const sevC=r.score>=70?'#d92d20':r.score>=45?'#f79009':'#0f8378';
+      const c12m=this.optC12Meta(r.c12);
+      const exp=optExp===r.perfil;
+      const brechaTxt=r.brecha>0?'+'+r.brecha:''+r.brecha;
+      return {perfil:r.perfil,cat:r.cat,grados:r.grados,dot:r.dot,vac:r.vac,catColor:r.catColor,
+        idxCarga:r.idxCarga+'%',idxBar:`height:100%;width:${Math.min(r.idxCarga,160)/1.6}%;background:${r.idxCarga>=115?'#d92d20':r.idxCarga>=100?'#f79009':'#0f8378'};border-radius:3px`,
+        optima:r.optima,brechaTxt,brechaStyle:`font-weight:600;color:${r.brecha>0?'#b42318':r.brecha<0?'#175cd3':'#6b7280'}`,
+        costoUnit:clp(r.costoUnit*1000),costoDef:r.costoDeficit>0?clp(r.costoDeficit*1000):'—',
+        score:r.score,scoreBar:`height:100%;width:${r.score}%;background:${sevC};border-radius:3px`,scoreColor:sevC,
+        c12Label:c12m.label,c12Style:`display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:${c12m.bg};color:${c12m.tx}`,
+        exp,onToggle:()=>this.toggleOptExp(r.perfil),
+        toggleLabel:exp?'▾ Sugerencia':'▸ Sugerencia',
+        nota:r.nota,
+        sugerencia: r.brecha>0
+          ? `Déficit de ${r.brecha} cupo(s): la carga (${r.idxCarga}%) supera el objetivo (${op.objetivo}%). Proveer costaría ~${clp(r.costoDeficit*1000)}/año. ${r.nota}`
+          : r.brecha<0
+            ? `Holgura de ${-r.brecha} cupo(s): carga bajo el objetivo. Evaluar redistribución antes de proveer. ${r.nota}`
+            : `Dotación equilibrada respecto al objetivo. ${r.nota}` };
+    });
+    const optKpis=[
+      {value:totalDot.toLocaleString('es-CL'),label:'Dotación actual (perfiles modelados)',accent:'#16202e'},
+      {value:totalOpt.toLocaleString('es-CL'),label:'Dotación óptima estimada',accent:'#0f8378'},
+      {value:(totalDef>0?'+':'')+totalDef,label:'Déficit de cupos (carga > objetivo)',accent:'#d92d20'},
+      {value:clp(totalCostoDef*1000),label:'Proyección de gasto anual (cerrar déficit)',accent:'#b54708'},
+    ];
+    const optCatAgg=['Conducción','Jefatura','Soporte','Ejecutor'].map(c=>{
+      const rs=optRows.filter(r=>r.cat===c);
+      const def=rs.reduce((s,r)=>s+Math.max(r.brecha,0),0);
+      const cost=rs.reduce((s,r)=>s+r.costoDeficit,0);
+      return {cat:c,color:catColor[c],def,cost:cost>0?clp(cost*1000):'$0',
+        bar:`height:100%;width:${totalDef>0?(def/totalDef*100):0}%;background:${catColor[c]};border-radius:4px`};
+    });
+    const optControls={
+      objetivo:op.objetivo,costo:op.costo,wCarga:op.wCarga,wVac:op.wVac,wCrit:op.wCrit,
+      onObjetivo:(e)=>this.setOpt('objetivo',+e.target.value),
+      onCosto:(e)=>this.setOpt('costo',+e.target.value),
+      onWCarga:(e)=>this.setOpt('wCarga',+e.target.value),
+      onWVac:(e)=>this.setOpt('wVac',+e.target.value),
+      onWCrit:(e)=>this.setOpt('wCrit',+e.target.value),
+      onReset:()=>this.resetOpt(),
+      costoTxt:clp(op.costo*1000),
+    };
+    const optBudget={
+      holguraCupos,holguraPesos:clp(holguraPesos*1000),totalDef,totalSup,
+      cabe,cabeLabel:cabe?'✓ El déficit cabe en la holgura de dotación':'✗ El déficit supera la holgura — requiere ampliación / Circular N°12',
+      cabeStyle:`display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:9px 14px;border-radius:9px;background:${cabe?'#e7f6ee':'#fef3f2'};color:${cabe?'#0f7a4f':'#b42318'}`,
+      defBar:`height:100%;width:${Math.min(totalDef/holguraCupos*100,100)}%;background:${cabe?'#0f8378':'#d92d20'};border-radius:5px`,
+    };
+
     // ---- procedimientos ----
     const prioMetaP={alta:['Alta','#fef3f2','#b42318','#d92d20'],media:['Media','#fffaeb','#b54708','#f79009'],baja:['Baja','#f1f3f5','#516072','#cdd2cc']};
     const stMetaP={pendiente:['Pendiente','#e2dfd6','#6b7280'],proceso:['En revisión','#f0a020','#fff'],actualizado:['Actualizado','#0f8378','#fff']};
@@ -1036,7 +1531,15 @@ class Component extends DCLogic {
     const procLog=this.state.procLog||{};const draft=this.state.draft||{};
     const procList=procFiltered.map(p=>{const pm=prioMetaP[p.prio];const upd=p.st==='actualizado';const tg=p.file.endsWith('.docx')?'DOC':'PDF';
       const logs=procLog[p.id]||[];const exp=this.state.procExp===p.id;
+      const aiOpen=this.state.aiExp===p.id;const aiLoad=!!(this.state.aiLoad||{})[p.id];const aiRes=(this.state.aiRes||{})[p.id];const aiErr=(this.state.aiErr||{})[p.id];
       return {code:p.code,name:p.name,area:p.area,motivo:p.motivo,file:p.file,tag:tg,tagStyle:ptag(tg),
+        aiOpen,aiLoad,aiErr:aiErr||'',hasAiErr:!!aiErr,hasAiRes:!!aiRes,
+        aiEnfoque:aiRes?aiRes.enfoque||[]:[],
+        aiNormativa:aiRes?(aiRes.normativa||[]).map(n=>({ley:n.ley,articulos:(n.articulos||[]).map(a=>({art:a.art,detalle:a.detalle}))})):[],
+        aiRiesgos:aiRes?aiRes.riesgos||[]:[],
+        onAskAI:()=>this.toggleAI({id:p.id,name:p.name,area:p.area,motivo:p.motivo}),
+        onRetryAI:()=>this.runAI({id:p.id,name:p.name,area:p.area,motivo:p.motivo}),
+        aiToggleStyle:`display:inline-flex;align-items:center;gap:6px;border:1px solid ${aiOpen?'#6d28d9':'#e3d9fb'};cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;padding:5px 11px;border-radius:7px;background:${aiOpen?'#f3effe':'#faf7ff'};color:#6d28d9;white-space:nowrap`,
         barColor:upd?'#0f8378':pm[3],
         prioLabel:'Urgencia '+pm[0],prioStyle:`font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:${pm[1]};color:${pm[2]}`,
         nameStyle:`font-size:14px;font-weight:600;color:#16202e;margin-top:8px;line-height:1.35;${upd?'':''}`,
@@ -1069,7 +1572,7 @@ class Component extends DCLogic {
 
     return {
       navGroups,pageKicker:t[1],pageTitle:t[0],
-      isResumen:v==='resumen',isDotacion:v==='dotacion',isCentral:v==='central',isVacantes:v==='vacantes',isRiesgo:v==='riesgo',isSeguimiento:v==='seguimiento',isProcedimientos:v==='procedimientos',isReportes:v==='reportes',isDocumentos:v==='documentos',
+      isResumen:v==='resumen',isOptimo:v==='optimo',isDotacion:v==='dotacion',isCentral:v==='central',isOrganigrama:v==='organigrama',isVacantes:v==='vacantes',isRiesgo:v==='riesgo',isSeguimiento:v==='seguimiento',isProcedimientos:v==='procedimientos',isReportes:v==='reportes',isDocumentos:v==='documentos',
       kpis,chartUnits,catSummary,prioSummary,
       centralKpis,subdirs,
       tableUnits,sortTabs,
@@ -1079,6 +1582,8 @@ class Component extends DCLogic {
       segDone:done,segCurso:curso,segPend:pend,segTotal:total,
       segBarDone:`height:100%;width:${(done/total*100).toFixed(1)}%;background:#0f8378`,segBarCurso:`height:100%;width:${(curso/total*100).toFixed(1)}%;background:#f0a020`,
       segFilters,segList,
+      orgTabs,orgData,
+      optKpis,optList,optCatAgg,optControls,optBudget,
       procKpis,procPrioChips,procList,procActualizados,
       reportCards,onPrint:()=>this.printReport(),
       areaTabs,areaTitle:cur.label,areaColor:cur.color,areaDesc:cur.desc,areaSubs,
