@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Public Sans',system-ui,sans-serif;background:#eceae4;color:#1d2433;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#c7c4ba;border-radius:6px;border:3px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-track{background:transparent}
+  .mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;width:100%">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside style="width:252px;flex:none;background:#19202c;color:#aeb6c4;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto">
+    <div style="padding:22px 22px 18px;border-bottom:1px solid #28313f">
+      <div style="display:flex;align-items:center;gap:11px">
+        <div style="width:34px;height:34px;flex:none;border-radius:8px;background:#0f8378;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;letter-spacing:-.5px">F</div>
+        <div>
+          <div style="color:#fff;font-weight:700;font-size:14.5px;letter-spacing:-.2px;line-height:1.1">FOSIS</div>
+          <div style="font-size:11px;color:#7c8698;letter-spacing:.3px;margin-top:2px">Dotación 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <nav style="padding:10px 12px 14px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="4">
+        <div style="margin-top:10px">
+          <div style="font-size:10px;letter-spacing:1.1px;color:#5f6a7d;font-weight:700;padding:6px 12px 5px">{{ g.label }}</div>
+          <sc-for list="{{ g.items }}" as="item" hint-placeholder-count="2">
+            <button onClick="{{ item.onClick }}" style="{{ item.style }}">
+              <span style="width:16px;flex:none;text-align:center;font-size:13px">{{ item.icon }}</span>
+              <span style="flex:1;text-align:left">{{ item.label }}</span>
+              <span class="mono" style="{{ item.badgeStyle }}">{{ item.badge }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto;padding:15px 20px;border-top:1px solid #28313f;font-size:10.5px;color:#6b7588;line-height:1.55">
+      <div style="color:#9aa3b3;font-weight:600;margin-bottom:3px">Fuente</div>
+      Nómina May 2026 · Vacantes FOSIS · CEAL-SUSESO 2025 · Sistema VALS · Resoluciones de Estructura
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="background:#fff;border-bottom:1px solid #e2e0d9;padding:18px 34px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;position:sticky;top:0;z-index:5">
+      <div>
+        <div style="font-size:11.5px;letter-spacing:1.4px;color:#0f8378;font-weight:700;text-transform:uppercase">{{ pageKicker }}</div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-.6px;margin-top:3px;color:#16202e">{{ pageTitle }}</h1>
+      </div>
+      <div style="text-align:right;font-size:12px;color:#6b7280;line-height:1.5">
+        <div><span class="mono" style="color:#16202e;font-weight:600;font-size:13px">{{ activosTxt }}</span> funcionarios · <span class="mono" style="color:#16202e;font-weight:600">159</span> nivel central</div>
+        <div>Corte <span style="color:#16202e;font-weight:600">31 may 2026</span></div>
+      </div>
+    </header>
+
+    <div style="padding:26px 34px 52px;flex:1">
+
+      <!-- ============ RESUMEN ============ -->
+      <sc-if value="{{ isResumen }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:13px;margin-bottom:24px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:15px 15px 14px;border-top:3px solid {{ k.accent }}">
+              <div class="mono" style="font-size:26px;font-weight:600;letter-spacing:-1px;color:#16202e;line-height:1">{{ k.value }}</div>
+              <div style="font-size:11px;color:#5b6573;margin-top:7px;line-height:1.3;font-weight:500">{{ k.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:18px">
+          <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:22px 24px">
+            <h2 style="font-size:15px;font-weight:700;color:#16202e;letter-spacing:-.2px">Dotación real vs. autorizada</h2>
+            <p style="font-size:12px;color:#7a828f;margin:2px 0 18px">Por unidad · barra = dotación real · marca = autorizada</p>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ chartUnits }}" as="u" hint-placeholder-count="17">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:134px;flex:none;font-size:12px;text-align:right;color:#444b57;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.short }}</div>
+                  <div style="flex:1;position:relative;height:20px;background:#f1efe9;border-radius:5px;overflow:hidden">
+                    <div style="{{ u.barStyle }}"></div>
+                    <div style="{{ u.autMarkStyle }}"></div>
+                  </div>
+                  <div class="mono" style="width:92px;flex:none;font-size:12px;color:#16202e;text-align:right">{{ u.real }}<span style="color:#aab0bb"> / {{ u.autTxt }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid #efede7;font-size:11.5px;color:#6b7280">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#0f8378;display:inline-block"></span>Dotación real</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:3px;height:13px;background:#16202e;display:inline-block"></span>Dotación autorizada</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:22px 24px">
+              <h2 style="font-size:15px;font-weight:700;color:#16202e;letter-spacing:-.2px;margin-bottom:16px">Vacantes por categoría</h2>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <sc-for list="{{ catSummary }}" as="c" hint-placeholder-count="4">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span style="color:#444b57;font-weight:500">{{ c.label }}</span><span class="mono" style="color:#16202e;font-weight:600">{{ c.count }}</span></div>
+                    <div style="height:8px;background:#f1efe9;border-radius:4px;overflow:hidden"><div style="{{ c.barStyle }}"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#16202e;border-radius:14px;padding:22px 24px;color:#fff">
+              <h2 style="font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:4px">Prioridad de intervención</h2>
+              <p style="font-size:12px;color:#9aa3b3;margin-bottom:16px">Unidades por urgencia de provisión</p>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ prioSummary }}" as="p" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ p.dot }}"></span>
+                    <span style="flex:1;font-size:13px;color:#dfe3ea">{{ p.label }}</span>
+                    <span class="mono" style="font-size:18px;font-weight:600">{{ p.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ NIVEL CENTRAL ============ -->
+      <sc-if value="{{ isCentral }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="background:#16202e;border-radius:14px;padding:20px 26px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div>
+            <div style="color:#fff;font-size:16px;font-weight:700">Dirección Nacional · Nivel Central</div>
+            <div style="color:#9aa3b3;font-size:12.5px;margin-top:3px">6 subdirecciones · 30 unidades · organigrama vigente 2026</div>
+          </div>
+          <div style="display:flex;gap:26px">
+            <sc-for list="{{ centralKpis }}" as="c" hint-placeholder-count="4">
+              <div style="text-align:center">
+                <div class="mono" style="color:#fff;font-size:24px;font-weight:600;line-height:1">{{ c.value }}</div>
+                <div style="color:#8b95a6;font-size:10.5px;margin-top:5px;letter-spacing:.3px">{{ c.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+          <sc-for list="{{ subdirs }}" as="s" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:13px;padding:18px 20px;border-left:4px solid {{ s.color }}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px">
+                <div>
+                  <div style="font-size:14.5px;font-weight:700;color:#16202e;line-height:1.2">{{ s.name }}</div>
+                  <div style="font-size:11px;color:#9098a4;margin-top:2px">{{ s.code }}</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="mono" style="font-size:22px;font-weight:600;color:#16202e;line-height:1">{{ s.total }}</div>
+                  <div class="mono" style="font-size:11px;color:{{ s.color }};font-weight:600">{{ s.pct }}</div>
+                </div>
+              </div>
+              <div style="height:6px;background:#f1efe9;border-radius:3px;overflow:hidden;margin-bottom:13px"><div style="{{ s.barStyle }}"></div></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ s.depts }}" as="d" hint-placeholder-count="5">
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#475061;background:#f5f4ef;padding:3px 9px;border-radius:6px;white-space:nowrap">{{ d.name }}<span class="mono" style="color:#9098a4;font-weight:600">{{ d.count }}</span></span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ DOTACIÓN ============ -->
+      <sc-if value="{{ isDotacion }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;overflow:hidden">
+        <div style="padding:18px 24px;border-bottom:1px solid #eeece6;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <h2 style="font-size:15px;font-weight:700;color:#16202e">Plantilla de dotación por unidad</h2>
+            <p style="font-size:12px;color:#7a828f;margin-top:2px">16 regiones + Dirección Nacional · ordenar por columna</p>
+          </div>
+          <div style="display:flex;gap:6px;background:#f3f1ec;padding:4px;border-radius:9px">
+            <sc-for list="{{ sortTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:760px">
+            <thead>
+              <tr style="background:#faf9f6;color:#6b7280;text-align:left">
+                <th style="padding:11px 24px;font-weight:600;font-size:11px;letter-spacing:.4px">UNIDAD</th>
+                <th style="padding:11px 10px;font-weight:600;font-size:11px;text-align:right">REAL</th>
+                <th style="padding:11px 10px;font-weight:600;font-size:11px;text-align:right">AUTOR.</th>
+                <th style="padding:11px 10px;font-weight:600;font-size:11px;text-align:right">BRECHA</th>
+                <th style="padding:11px 10px;font-weight:600;font-size:11px;text-align:right">VAC.</th>
+                <th style="padding:11px 10px;font-weight:600;font-size:11px;text-align:right">CRÍT.</th>
+                <th style="padding:11px 14px;font-weight:600;font-size:11px;text-align:right">SCORE</th>
+                <th style="padding:11px 24px;font-weight:600;font-size:11px">PRIORIDAD</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ tableUnits }}" as="u" hint-placeholder-count="17">
+                <tr style="border-top:1px solid #f0eee8">
+                  <td style="padding:11px 24px">
+                    <div style="font-weight:600;color:#16202e">{{ u.short }}</div>
+                    <div style="font-size:11px;color:#9098a4;margin-top:1px">{{ u.size }}</div>
+                  </td>
+                  <td class="mono" style="padding:11px 10px;text-align:right;font-weight:600;color:#16202e">{{ u.real }}</td>
+                  <td class="mono" style="padding:11px 10px;text-align:right;color:#6b7280">{{ u.autTxt }}</td>
+                  <td style="padding:11px 10px;text-align:right"><span class="mono" style="{{ u.brechaStyle }}">{{ u.brechaTxt }}</span></td>
+                  <td class="mono" style="padding:11px 10px;text-align:right;color:#16202e">{{ u.vac }}</td>
+                  <td style="padding:11px 10px;text-align:right"><span class="mono" style="{{ u.vcritStyle }}">{{ u.vcrit }}</span></td>
+                  <td style="padding:11px 14px;text-align:right">
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
+                      <div style="width:46px;height:6px;background:#f1efe9;border-radius:3px;overflow:hidden"><div style="{{ u.scoreBar }}"></div></div>
+                      <span class="mono" style="color:#16202e;font-weight:600;width:34px;text-align:right">{{ u.score }}</span>
+                    </div>
+                  </td>
+                  <td style="padding:11px 24px"><span style="{{ u.prioStyle }}">{{ u.prioLabel }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+            <tfoot>
+              <tr style="border-top:2px solid #e6e4dd;background:#faf9f6">
+                <td style="padding:13px 24px;font-weight:700;color:#16202e">TOTAL FOSIS</td>
+                <td class="mono" style="padding:13px 10px;text-align:right;font-weight:700;color:#16202e">{{ totalRealTxt }}</td>
+                <td class="mono" style="padding:13px 10px;text-align:right;font-weight:600;color:#6b7280">1.058</td>
+                <td class="mono" style="padding:13px 10px;text-align:right;font-weight:600;color:#0f8378">{{ totalBrechaTxt }}</td>
+                <td class="mono" style="padding:13px 10px;text-align:right;font-weight:700;color:#16202e">68</td>
+                <td class="mono" style="padding:13px 10px;text-align:right;font-weight:700;color:#b42318">41</td>
+                <td class="mono" style="padding:13px 14px;text-align:right;font-weight:700;color:#16202e">91,9</td>
+                <td style="padding:13px 24px"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ VACANTES ============ -->
+      <sc-if value="{{ isVacantes }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+          <span style="font-size:11px;letter-spacing:.5px;color:#9098a4;font-weight:700">FILTRAR</span>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:12px;color:#6b7280">Región</span>
+            <select onChange="{{ onRegionChange }}" style="font-family:inherit;font-size:12.5px;padding:6px 10px;border:1px solid #dcdad3;border-radius:8px;background:#fff;color:#16202e;max-width:220px">
+              <sc-for list="{{ regionOptions }}" as="o" hint-placeholder-count="5">
+                <option value="{{ o.value }}" selected="{{ o.selected }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="font-size:12px;color:#6b7280">Impacto</span>
+            <sc-for list="{{ impactChips }}" as="c" hint-placeholder-count="5">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="font-size:12px;color:#6b7280">Vía</span>
+            <sc-for list="{{ viaChips }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#6b7280"><span class="mono" style="color:#16202e;font-weight:700">{{ vacActive }}</span> activas · <span class="mono" style="color:#0f7a4f;font-weight:700">{{ vacFilled }}</span> provistas</span>
+            <button onClick="{{ onResetFilled }}" style="{{ resetStyle }}">↺ Restablecer</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#7a828f;margin-bottom:13px">Haz clic en un cargo para marcarlo como <b style="color:#0f7a4f">provisto</b>: descuenta de las vacantes y suma a funcionarios activos.</div>
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+          <span style="font-size:11px;letter-spacing:.5px;color:#9098a4;font-weight:700;margin-right:2px">VÍA DE PROVISIÓN</span>
+          <sc-for list="{{ viaSummary }}" as="s" hint-placeholder-count="5">
+            <span style="{{ s.style }}">{{ s.label }} · {{ s.count }}</span>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:13px">
+          <sc-for list="{{ vacList }}" as="v" hint-placeholder-count="9">
+            <div onClick="{{ v.onClick }}" style="{{ v.cardStyle }}" style-hover="border-color:#0f8378">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                <div style="{{ v.cargoStyle }}">{{ v.cargo }}</div>
+                <span style="{{ v.badgeStyle }}">{{ v.badge }}</span>
+              </div>
+              <div style="font-size:12px;color:#7a828f;margin-top:5px">{{ v.region }} · Grado <span class="mono">{{ v.grado }}</span> · Prog. <span class="mono">{{ v.programa }}</span></div>
+              <div style="margin-top:9px"><span style="{{ v.viaStyle }}">{{ v.viaLabel }}</span></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:11px;border-top:1px solid #f1efe9">
+                <span style="{{ v.levelStyle }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ v.dotShown }};display:inline-block"></span>{{ v.levelLabel }}</span>
+                <span style="font-size:11.5px;color:#9098a4;margin-left:auto">{{ v.action }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ CLIMA & DENUNCIAS ============ -->
+      <sc-if value="{{ isRiesgo }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+          <sc-for list="{{ riesgoKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:16px;border-top:3px solid {{ k.accent }}">
+              <div class="mono" style="font-size:25px;font-weight:600;letter-spacing:-1px;color:#16202e;line-height:1">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:#5b6573;margin-top:7px;line-height:1.3;font-weight:500">{{ k.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;overflow:hidden;margin-bottom:18px">
+          <div style="padding:16px 24px;border-bottom:1px solid #eeece6">
+            <h2 style="font-size:15px;font-weight:700;color:#16202e">Riesgo psicosocial (CEAL) y denuncias Ley Karin por unidad</h2>
+            <p style="font-size:12px;color:#7a828f;margin-top:2px">CEAL-SM/SUSESO 2025 · Sistema VALS 2018-2026 · % = trabajadores en riesgo alto</p>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:820px">
+              <thead>
+                <tr style="background:#faf9f6;color:#6b7280;text-align:left">
+                  <th style="padding:11px 24px;font-weight:600;font-size:11px">UNIDAD</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px">RIESGO CEAL</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px;text-align:right">SCORE</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px;text-align:right">CARGA</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px;text-align:right">LIDERAZGO</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px;text-align:right">DENUNCIAS</th>
+                  <th style="padding:11px 12px;font-weight:600;font-size:11px;text-align:right">TASA/100</th>
+                  <th style="padding:11px 24px;font-weight:600;font-size:11px">TENDENCIA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ riesgoRows }}" as="r" hint-placeholder-count="17">
+                  <tr style="border-top:1px solid #f0eee8">
+                    <td style="padding:10px 24px;font-weight:600;color:#16202e">{{ r.region }}</td>
+                    <td style="padding:10px 12px"><span style="{{ r.cealStyle }}">{{ r.cealLabel }}</span></td>
+                    <td class="mono" style="padding:10px 12px;text-align:right;color:#16202e">{{ r.score }}</td>
+                    <td style="padding:10px 12px;text-align:right"><span class="mono" style="{{ r.cargaStyle }}">{{ r.carga }}</span></td>
+                    <td style="padding:10px 12px;text-align:right"><span class="mono" style="{{ r.lidStyle }}">{{ r.lid }}</span></td>
+                    <td class="mono" style="padding:10px 12px;text-align:right;font-weight:600;color:#16202e">{{ r.casos }}</td>
+                    <td class="mono" style="padding:10px 12px;text-align:right;color:#6b7280">{{ r.tasa }}</td>
+                    <td style="padding:10px 24px"><span style="{{ r.tendStyle }}">{{ r.tend }}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:22px 24px">
+            <h2 style="font-size:15px;font-weight:700;color:#16202e;margin-bottom:3px">Tipología de denuncias</h2>
+            <p style="font-size:12px;color:#7a828f;margin-bottom:16px">134 casos · 2018-2026</p>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <sc-for list="{{ tipologia }}" as="t" hint-placeholder-count="5">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span style="color:#444b57;font-weight:500">{{ t.label }}</span><span class="mono" style="color:#16202e;font-weight:600">{{ t.count }} · {{ t.pct }}</span></div>
+                  <div style="height:8px;background:#f1efe9;border-radius:4px;overflow:hidden"><div style="{{ t.barStyle }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="background:#2a1416;border:1px solid #4a2226;border-radius:14px;padding:22px 24px;color:#fff">
+              <h2 style="font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:#f97066;display:inline-block"></span>Hallazgos críticos</h2>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ hallazgos }}" as="h" hint-placeholder-count="4">
+                  <div style="font-size:12.5px;color:#e7d3d3;line-height:1.45"><span style="color:#fff;font-weight:700">{{ h.t }}</span> {{ h.d }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:18px 22px">
+              <h2 style="font-size:13.5px;font-weight:700;color:#16202e;margin-bottom:11px">Documentos Ley Karin</h2>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ karinDocs }}" as="d" hint-placeholder-count="4">
+                  <a href="{{ d.file }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:11px;padding:8px 0;text-decoration:none;border-top:1px solid #f4f2ec" style-hover="opacity:.7">
+                    <span style="{{ d.tagStyle }}">{{ d.tag }}</span>
+                    <span style="flex:1;font-size:12.5px;color:#2b333f">{{ d.name }}</span>
+                    <span style="font-size:11px;color:#b8bdc6">abrir ↗</span>
+                  </a>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SEGUIMIENTO ============ -->
+      <sc-if value="{{ isSeguimiento }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+          <div style="flex:1;min-width:260px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+              <h2 style="font-size:15px;font-weight:700;color:#16202e">Avance Hoja de Ruta DO 2026-2027</h2>
+              <span class="mono" style="font-size:13px;color:#16202e;font-weight:600">{{ segDone }} / {{ segTotal }} completadas</span>
+            </div>
+            <div style="height:12px;background:#f1efe9;border-radius:6px;overflow:hidden;display:flex">
+              <div style="{{ segBarDone }}"></div>
+              <div style="{{ segBarCurso }}"></div>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:#6b7280">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#0f8378;display:inline-block"></span>Completadas {{ segDone }}</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#f0a020;display:inline-block"></span>En curso {{ segCurso }}</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#e2dfd6;display:inline-block"></span>Pendientes {{ segPend }}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;background:#f3f1ec;padding:4px;border-radius:9px">
+            <sc-for list="{{ segFilters }}" as="f" hint-placeholder-count="4">
+              <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ segList }}" as="a" hint-placeholder-count="8">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-left:4px solid {{ a.barColor }};border-radius:11px;padding:15px 18px;display:flex;gap:16px;align-items:flex-start">
+              <div class="mono" style="width:30px;flex:none;font-size:16px;font-weight:600;color:#c2c7cf;padding-top:1px">{{ a.num }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                  <span style="{{ a.horizStyle }}">{{ a.horizonte }}</span>
+                  <span style="{{ a.prioStyle }}">{{ a.prioLabel }}</span>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#16202e;margin-top:8px;line-height:1.35">{{ a.title }}</div>
+                <div style="display:flex;gap:18px;margin-top:8px;font-size:12px;color:#7a828f;flex-wrap:wrap">
+                  <span>👤 {{ a.resp }}</span>
+                  <span>🗓 {{ a.plazo }}</span>
+                  <span>🎯 {{ a.indicador }}</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:5px;flex:none">
+                <sc-for list="{{ a.statusBtns }}" as="b" hint-placeholder-count="3">
+                  <button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ PROCEDIMIENTOS ============ -->
+      <sc-if value="{{ isProcedimientos }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+          <sc-for list="{{ procKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:16px;border-top:3px solid {{ k.accent }}">
+              <div class="mono" style="font-size:25px;font-weight:600;letter-spacing:-1px;color:#16202e;line-height:1">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:#5b6573;margin-top:7px;line-height:1.3;font-weight:500">{{ k.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:11px;letter-spacing:.5px;color:#9098a4;font-weight:700">URGENCIA</span>
+          <div style="display:flex;gap:6px;background:#f3f1ec;padding:4px;border-radius:9px">
+            <sc-for list="{{ procPrioChips }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="margin-left:auto;font-size:13px;color:#6b7280"><span class="mono" style="color:#0f7a4f;font-weight:700">{{ procActualizados }}</span> / 16 actualizados</div>
+        </div>
+        <div style="font-size:12px;color:#7a828f;margin-bottom:13px">Marca el estado de cada procedimiento (Pendiente → En revisión → Actualizado). Clic en el código para abrir el documento. El estado se guarda en tu navegador.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ procList }}" as="p" hint-placeholder-count="16">
+            <div style="background:#fff;border:1px solid #e6e4dd;border-left:4px solid {{ p.barColor }};border-radius:11px;overflow:hidden">
+              <div style="padding:15px 18px;display:flex;gap:16px;align-items:flex-start">
+                <a href="{{ p.file }}" target="_blank" rel="noopener" style="flex:none;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:5px;width:78px" style-hover="opacity:.7">
+                  <span style="{{ p.tagStyle }}">{{ p.tag }}</span>
+                  <span class="mono" style="font-size:10px;color:#9098a4;text-align:center;line-height:1.3">{{ p.code }}</span>
+                </a>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <span style="{{ p.prioStyle }}">{{ p.prioLabel }}</span>
+                    <span style="font-size:11.5px;color:#9098a4">{{ p.area }}</span>
+                  </div>
+                  <div style="{{ p.nameStyle }}">{{ p.name }}</div>
+                  <div style="font-size:12px;color:#7a828f;margin-top:5px">{{ p.motivo }}</div>
+                  <div style="margin-top:11px"><button onClick="{{ p.onToggle }}" style="{{ p.toggleStyle }}">{{ p.toggleLabel }}</button></div>
+                </div>
+                <div style="display:flex;gap:5px;flex:none">
+                  <sc-for list="{{ p.statusBtns }}" as="b" hint-placeholder-count="3">
+                    <button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#faf9f6;border-top:1px solid #eeece6;padding:16px 18px 18px 96px">
+                <div style="font-size:11px;letter-spacing:.5px;color:#9098a4;font-weight:700;margin-bottom:11px">REGISTRO DE ACTUALIZACIONES</div>
+                <sc-if value="{{ p.hasLogs }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+                  <sc-for list="{{ p.logs }}" as="e" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #e6e4dd;border-radius:9px;padding:10px 13px">
+                      <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;width:74px">
+                        <span class="mono" style="font-size:11px;color:#16202e;font-weight:600">{{ e.date }}</span>
+                        <sc-if value="{{ e.hasVer }}" hint-placeholder-val="{{ false }}"><span class="mono" style="font-size:10px;color:#0f7a4f;background:#e7f6ee;padding:1px 7px;border-radius:5px;font-weight:600">{{ e.ver }}</span></sc-if>
+                      </div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:12.5px;color:#2b333f;line-height:1.4;padding-top:1px">{{ e.note }}</div>
+                        <sc-if value="{{ e.hasFile }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ e.onOpen }}" style="margin-top:7px;display:inline-flex;align-items:center;gap:7px;border:1px solid #dce6e3;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;background:#f3faf8;color:#0f6b62" style-hover="background:#e7f6f3">📎 {{ e.fileName }} <span style="color:#9bb5af;font-weight:500">{{ e.fileSize }} · descargar ↓</span></button>
+                        </sc-if>
+                      </div>
+                      <button onClick="{{ e.onDel }}" style="flex:none;border:none;background:transparent;cursor:pointer;color:#c0392b;font-size:14px;padding:0 4px" style-hover="opacity:.6">✕</button>
+                    </div>
+                  </sc-for>
+                </div>
+                </sc-if>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <input value="{{ p.verVal }}" onInput="{{ p.onVer }}" placeholder="Versión (ej. V6)" style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:110px;padding:8px 10px;border:1px solid #dcdad3;border-radius:8px;background:#fff;color:#16202e"></input>
+                  <input value="{{ p.noteVal }}" onInput="{{ p.onNote }}" placeholder="Describe la actualización realizada…" style="flex:1;min-width:200px;font-family:inherit;font-size:12.5px;padding:8px 11px;border:1px solid #dcdad3;border-radius:8px;background:#fff;color:#16202e"></input>
+                  <button onClick="{{ p.onAdd }}" style="border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:8px;background:#0f8378;color:#fff;white-space:nowrap" style-hover="background:#0d7268">+ Registrar</button>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;margin-top:9px;flex-wrap:wrap">
+                  <button onClick="{{ p.onPickFile }}" style="display:inline-flex;align-items:center;gap:7px;border:1px dashed #c4c0b5;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;background:#fff;color:#6b7280" style-hover="border-color:#0f8378;color:#0f6b62">📎 Adjuntar archivo actualizado</button>
+                  <sc-if value="{{ p.hasDraftFile }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#0f6b62;background:#e7f6f3;padding:6px 11px;border-radius:8px;font-weight:600">{{ p.draftFileName }}<button onClick="{{ p.onClearFile }}" style="border:none;background:transparent;cursor:pointer;color:#0f6b62;font-size:13px;padding:0">✕</button></span>
+                  </sc-if>
+                  <span style="font-size:11px;color:#9098a4">Se guarda en este navegador. Adjunta el PDF/Word de la nueva versión.</span>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ REPORTES ============ -->
+      <sc-if value="{{ isReportes }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="background:#16202e;border-radius:14px;padding:24px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div>
+            <div style="color:#fff;font-size:17px;font-weight:700">Informe ejecutivo de dotación</div>
+            <div style="color:#9aa3b3;font-size:12.5px;margin-top:4px;max-width:520px">Genera un reporte consolidado imprimible (dotación, vacantes, riesgo y seguimiento) listo para PDF o impresión.</div>
+          </div>
+          <button onClick="{{ onPrint }}" style="background:#0f8378;color:#fff;border:none;border-radius:10px;padding:13px 22px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:9px" style-hover="background:#0d7268">🖨 Generar informe PDF</button>
+        </div>
+        <div style="font-size:11px;letter-spacing:1px;color:#9098a4;font-weight:700;margin-bottom:12px">DESCARGAS DE DATOS (CSV · EXCEL)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+          <sc-for list="{{ reportCards }}" as="r" hint-placeholder-count="5">
+            <button onClick="{{ r.onClick }}" style="text-align:left;background:#fff;border:1px solid #e6e4dd;border-radius:12px;padding:18px 20px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:0" style-hover="border-color:#0f8378">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:3px 7px;border-radius:5px;background:#e7f6ee;color:#0f7a4f">{{ r.fmt }}</span>
+                <span style="font-size:18px;color:#0f8378">↓</span>
+              </div>
+              <div style="font-size:14px;font-weight:700;color:#16202e;margin-top:13px">{{ r.title }}</div>
+              <div style="font-size:12px;color:#7a828f;margin-top:4px;line-height:1.4">{{ r.desc }}</div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ DOCUMENTOS ============ -->
+      <sc-if value="{{ isDocumentos }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:268px 1fr;gap:18px;align-items:start">
+        <div style="background:#fff;border:1px solid #e6e4dd;border-radius:13px;padding:10px;position:sticky;top:90px">
+          <div style="font-size:10.5px;letter-spacing:1px;color:#9098a4;font-weight:700;padding:8px 12px 6px">ÁREAS DE TRABAJO</div>
+          <sc-for list="{{ areaTabs }}" as="a" hint-placeholder-count="5">
+            <button onClick="{{ a.onClick }}" style="{{ a.style }}">
+              <span style="width:8px;height:8px;border-radius:2px;flex:none;background:{{ a.color }}"></span>
+              <span style="flex:1;text-align:left;line-height:1.25">{{ a.label }}</span>
+              <span class="mono" style="font-size:11px;font-weight:600;color:#9098a4">{{ a.count }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div>
+          <div style="background:#fff;border:1px solid #e6e4dd;border-radius:13px;padding:22px 26px;margin-bottom:16px;border-top:4px solid {{ areaColor }}">
+            <h2 style="font-size:18px;font-weight:800;color:#16202e;letter-spacing:-.4px">{{ areaTitle }}</h2>
+            <p style="font-size:13px;color:#7a828f;margin-top:4px">{{ areaDesc }}</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ areaSubs }}" as="s" hint-placeholder-count="5">
+              <div style="background:#fff;border:1px solid #e6e4dd;border-radius:12px;overflow:hidden">
+                <div style="padding:13px 20px;background:#faf9f6;border-bottom:1px solid #eeece6;display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-weight:700;color:#16202e;font-size:13.5px">{{ s.name }}</span>
+                  <span class="mono" style="font-size:11.5px;color:#9098a4">{{ s.count }} docs</span>
+                </div>
+                <div>
+                  <sc-for list="{{ s.docs }}" as="d" hint-placeholder-count="4">
+                    <a href="{{ d.file }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:11px 20px;border-top:1px solid #f4f2ec;text-decoration:none" style-hover="background:#f7faf9">
+                      <span style="{{ d.tagStyle }}">{{ d.tag }}</span>
+                      <span style="flex:1;font-size:13px;color:#2b333f;line-height:1.3">{{ d.name }}</span>
+                      <span style="font-size:11px;color:#b8bdc6">abrir ↗</span>
+                    </a>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view:'resumen', sort:'real', vacRegion:'all', vacImpact:'all', vacVia:'all', area:'do', segH:'all', procPrio:'all', track:null, filled:null, procSt:null, procExp:null, procLog:null, draft:{} };
+
+  componentDidMount(){
+    let t={},f={},p={},l={};
+    try{ const s=localStorage.getItem('fosis_track'); if(s) t=JSON.parse(s); }catch(e){}
+    try{ const s=localStorage.getItem('fosis_filled'); if(s) f=JSON.parse(s); }catch(e){}
+    try{ const s=localStorage.getItem('fosis_proc'); if(s) p=JSON.parse(s); }catch(e){}
+    try{ const s=localStorage.getItem('fosis_proc_log'); if(s) l=JSON.parse(s); }catch(e){}
+    this.setState({track:{...this.defaultTrack(),...t},filled:f,procSt:p,procLog:l});
+  }
+  idb(){
+    if(this._idb) return this._idb;
+    this._idb=new Promise((res,rej)=>{
+      const r=indexedDB.open('fosis_files',1);
+      r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains('files')) r.result.createObjectStore('files'); };
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+    });
+    return this._idb;
+  }
+  async idbPut(key,blob){ const db=await this.idb(); return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put(blob,key);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}); }
+  async idbGet(key){ const db=await this.idb(); return new Promise((res,rej)=>{const tx=db.transaction('files','readonly');const rq=tx.objectStore('files').get(key);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);}); }
+  async idbDel(key){ const db=await this.idb(); return new Promise((res)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').delete(key);tx.oncomplete=()=>res();}); }
+  async openAttachment(key,name){
+    const blob=await this.idbGet(key); if(!blob){ alert('Archivo no encontrado en este navegador.'); return; }
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name||'archivo';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }
+  pickFile(id){
+    const inp=document.createElement('input');inp.type='file';
+    inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(f) this.setState(s=>({draft:{...s.draft,[id+'_file']:f}})); };
+    inp.click();
+  }
+  clearDraftFile(id){ this.setState(s=>{const d={...s.draft};delete d[id+'_file'];return {draft:d};}); }
+  toggleProcExp(id){ this.setState(s=>({procExp:s.procExp===id?null:id})); }
+  setDraft(id,field,val){ this.setState(s=>({draft:{...s.draft,[id+'_'+field]:val}})); }
+  async addProcUpdate(id){
+    const ver=(this.state.draft[id+'_ver']||'').trim();
+    const note=(this.state.draft[id+'_note']||'').trim();
+    const file=this.state.draft[id+'_file'];
+    if(!ver&&!note&&!file) return;
+    const entry={date:new Date().toLocaleDateString('es-CL'),ver,note};
+    if(file){
+      const key='att_'+id+'_'+Date.now();
+      try{ await this.idbPut(key,file); entry.fileKey=key; entry.fileName=file.name; entry.fileSize=file.size; }
+      catch(e){ alert('No se pudo guardar el archivo.'); }
+    }
+    const log={...(this.state.procLog||{})};
+    log[id]=[entry,...(log[id]||[])];
+    try{ localStorage.setItem('fosis_proc_log',JSON.stringify(log)); }catch(e){}
+    const d={...this.state.draft};delete d[id+'_ver'];delete d[id+'_note'];delete d[id+'_file'];
+    this.setState({procLog:log,draft:d});
+  }
+  delProcUpdate(id,i){
+    const log={...(this.state.procLog||{})};
+    const entry=(log[id]||[])[i];
+    if(entry&&entry.fileKey){ this.idbDel(entry.fileKey); }
+    log[id]=(log[id]||[]).filter((_,k)=>k!==i);
+    try{ localStorage.setItem('fosis_proc_log',JSON.stringify(log)); }catch(e){}
+    this.setState({procLog:log});
+  }
+  fmtSize(b){ if(!b)return''; if(b<1024)return b+' B'; if(b<1048576)return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+  setProcSt(id,st){
+    const cur={...(this.state.procSt||{})};cur[id]=st;
+    try{ localStorage.setItem('fosis_proc',JSON.stringify(cur)); }catch(e){}
+    this.setState({procSt:cur});
+  }
+  procedures(){return [
+    [1,'PR-GDP-6.1-01','Requisición de Personal','Reclutamiento y Selección','Solicitud y autorización de vacantes','alta','pendiente','docs/proc_requisicion_personal.pdf'],
+    [2,'PR-GDP-6.1-02','Reclutamiento y Selección contrata y honorarios','Reclutamiento y Selección','Proceso de selección','baja','actualizado','docs/proc_reclutamiento_contrata.pdf'],
+    [3,'PR-GDP-6.1-03','Concursos de Planta','Reclutamiento y Selección','Concursos de ingreso, promoción y ADP','alta','pendiente','docs/proc_concursos_planta.pdf'],
+    [4,'PR-GDP-6.2.1-01','Movilidad Interna','Reclutamiento y Selección','Provisión interna de cargos','baja','actualizado','docs/proc_movilidad_interna.pdf'],
+    [5,'PR-GDP-6.2.2-02','Inducción, Reinducción y Movilidad Interna','Inducción','Inducción, reinducción y movilidad','baja','pendiente','docs/proc_induccion_2026.docx'],
+    [6,'FC-P-00047','Estrategia Formación Trienal y Plan Anual de Capacitación','Capacitación','Plan anual de capacitación','alta','pendiente','docs/estrategia_capacitacion_2026.pdf'],
+    [7,'PR-GDP-6.2.2-07','Ejecución de las Actividades de Capacitación','Capacitación','Ejecución del Plan Anual de Capacitación','alta','pendiente','docs/proc_ejecucion_capacitacion.pdf'],
+    [8,'PR-GDP-6.2.2-08','Evaluación Eficacia / Transferencia de la Capacitación','Capacitación','Evaluación de eficacia y transferencia','alta','pendiente','docs/proc_evaluacion_capacitacion.pdf'],
+    [9,'PR-GDP-6.2.2-05','Gestión del Desempeño y Calificación Anual','Evaluación de Desempeño','Gestión del desempeño y calificación','alta','pendiente','docs/proc_evaluacion_desempeno_v8.pdf'],
+    [10,'PR-GDP-6.2.2-01','Creación y Actualización de Estructuras y Perfiles de Cargo','Estructura Organizacional','Organigramas y perfiles de cargo','alta','pendiente','docs/proc_estructura_perfiles.pdf'],
+    [11,'FC-P-00307','Política de Reconocimiento Personas Funcionarias','Reconocimiento','Reconocimiento a funcionarios/as','baja','pendiente','docs/politica_reconocimiento.pdf'],
+    [12,'FC-P-00480','Denuncia ante Acoso Sexual, Laboral y Violencia en el Trabajo','Calidad de Vida','Prevención de acoso y violencia laboral','alta','pendiente','docs/proc_denuncia_acoso.pdf'],
+    [13,'FC-P-00599','Política de Inclusión y Diversidad','Calidad de Vida','Inclusión laboral (Ley 21.015)','media','pendiente','docs/politica_inclusion.pdf'],
+    [14,'FC-F-00631','Protocolo de Inclusión Laboral y Diversidad','Calidad de Vida','Actualiza protocolo de inclusión','media','pendiente','docs/protocolo_inclusion.pdf'],
+    [15,'RES. EX. 0228','Política de Gestión y Desarrollo de Personas','Transversal','Marco transversal a todas las áreas','media','pendiente','docs/politica_gestion_personas.pdf'],
+    [16,'RES. EX. 0229','Política de Compensaciones','Transversal','Marco de compensaciones','media','pendiente','docs/politica_compensaciones.pdf'],
+  ];}
+  defaultProc(){const o={};this.procedures().forEach(p=>o[p[0]]=p[6]);return o;}
+  procStatusOf(id){const s=this.state.procSt||{};return s[id]||this.defaultProc()[id];}
+  toggleFilled(idx){
+    const cur={...(this.state.filled||{})};
+    if(cur[idx]) delete cur[idx]; else cur[idx]=true;
+    try{ localStorage.setItem('fosis_filled',JSON.stringify(cur)); }catch(e){}
+    this.setState({filled:cur});
+  }
+  resetFilled(){
+    try{ localStorage.setItem('fosis_filled','{}'); }catch(e){}
+    this.setState({filled:{}});
+  }
+  defaultTrack(){ return {1:'curso',2:'curso',3:'curso',5:'curso',7:'curso'}; }
+  setStatus(id,st){
+    const cur=this.state.track||this.defaultTrack();
+    const next={...cur,[id]:st};
+    try{ localStorage.setItem('fosis_track',JSON.stringify(next)); }catch(e){}
+    this.setState({track:next});
+  }
+
+  // ---------- data ----------
+  units(){
+    const d=[
+      ['Región de Antofagasta','Antofagasta','Pequeña',34,36,3,1,91.6,2],
+      ['Región de Arica y Parinacota','Arica y Parinacota','Pequeña',30,32,3,1,90.7,2],
+      ['Región de Atacama','Atacama','Pequeña',33,37,1,1,83.8,2],
+      ['Región de Aysén','Aysén','Pequeña',35,null,4,2,100,1],
+      ['Región de Coquimbo','Coquimbo','Mediana',46,null,2,1,100,2],
+      ['Región de Los Lagos','Los Lagos','Mediana',61,66,7,4,88.6,1],
+      ['Región de Los Ríos','Los Ríos','Mediana',41,null,3,2,100,2],
+      ['Región de Magallanes','Magallanes','Pequeña',32,33,1,1,95.5,3],
+      ['Región de O\u2019Higgins','O\u2019Higgins','Mediana',61,63,1,1,95.2,2],
+      ['Región de Tarapacá','Tarapacá','Pequeña',31,35,3,2,82.9,2],
+      ['Región de Valparaíso','Valparaíso','Grande',86,89,3,1,94.9,2],
+      ['Región de La Araucanía','La Araucanía','Grande',75,88,6,2,74.8,1],
+      ['Región de Ñuble','Ñuble','Pequeña',41,40,7,4,92.8,1],
+      ['Región del Biobío','Biobío','Grande',85,88,1,1,94.9,2],
+      ['Región del Maule','Maule','Mediana',64,65,1,1,95.1,2],
+      ['Dirección Regional Metropolitana','DR Metropolitana','Grande',125,133,6,4,91.0,1],
+      ['Dirección Nacional','Dirección Nacional','Grande',159,null,10,8,100,3],
+    ];
+    return d.map(r=>({name:r[0],short:r[1],size:r[2],real:r[3],aut:r[4],vac:r[5],vcrit:r[6],score:r[7],prio:r[8],brecha:r[4]==null?null:(r[4]-r[3])}));
+  }
+
+  vacancies(){
+    const C={C:'Conducción Estratégica',J:'Jefatura / Encargado',E:'Ejecutor de Programa',S:'Soporte y Especialización'};
+    const raw=[
+      ['Tarapacá','Director/a Regional','4','1','SI','C','crit'],['Tarapacá','Encargado/a de Control de Gestión Regional','12','1','SI','J','sup'],['Tarapacá','Agente de Desarrollo Local','17','3','NO','E','cob'],
+      ['Antofagasta','Director/a Regional','4','1','SI','C','crit'],['Antofagasta','Agente de Desarrollo Local','12','1','NO','E','cob'],['Antofagasta','Asistente Administrativo (Secretaría)','17','1','NO','S','op'],
+      ['Atacama','Director/a Regional','4','1','SI','C','crit'],
+      ['Coquimbo','Director/a Regional','4','1','SI','C','crit'],['Coquimbo','Analista Técnico Transversal','10','1','NO','S','op'],
+      ['Valparaíso','Director/a Regional','4','1','SI','C','crit'],['Valparaíso','Apoyo Provincial Programas SyO','16','4','NO','E','cob'],['Valparaíso','Gestor Familiar Programa EJE (Apoyo Porvenir)','17','4','NO','E','cob'],
+      ['O\u2019Higgins','Director/a Regional','4','1','SI','C','crit'],
+      ['Maule','Director/a Regional','4','1','SI','C','crit'],
+      ['Biobío','Director/a Regional','4','1','SI','C','crit'],
+      ['La Araucanía','Director/a Regional','4','1','SI','C','crit'],['La Araucanía','Encargado/a de Control de Gestión Regional','12','4','NO','J','sup'],['La Araucanía','Jefe/a Depto. Gestión de Programas','8','1','NO','J','sup'],['La Araucanía','Apoyo Provincial Programas SyO','17','4','NO','S','op'],['La Araucanía','Asistente Administrativo (Personas)','18','1','SI','S','op'],['La Araucanía','Asistente Jurídico Regional','11','1','NO','S','op'],
+      ['Los Lagos','Director/a Regional','4','1','SI','C','crit'],['Los Lagos','Encargado/a Regional de Programas','12','1','SI','J','sup'],['Los Lagos','Encargado/a de Personas Regional','10','1','NO','J','sup'],['Los Lagos','Contador Regional','10','1','NO','S','op'],['Los Lagos','Apoyo Provincial Programas SyO (Movilidad)','17','4','SI','E','cob'],['Los Lagos','Gestor Familiar Programa EJE','17','4','SI','E','cob'],['Los Lagos','Apoyo Técnico Regional Programas SyO','16','4','NO','S','op'],
+      ['Aysén','Director/a Regional','4','1','SI','C','crit'],['Aysén','Agente de Desarrollo Local','19','1','NO','E','cob'],['Aysén','Coordinador/a Alianzas Público-Privadas','17','4','NO','S','op'],['Aysén','Gestor Familiar EJE (\u2192 Prof. Rendiciones)','17','4','SI','E','cob'],
+      ['Magallanes','Director/a Regional','4','1','SI','C','crit'],
+      ['DR Metropolitana','Director/a Regional','4','1','SI','C','crit'],['DR Metropolitana','Asesor/a Jurídico Regional','8','1','SI','S','op'],['DR Metropolitana','Profesional de Gestión y Análisis','11','1','SI','S','op'],['DR Metropolitana','Profesional Regional de Programa','13','1','NO','S','op'],['DR Metropolitana','Asistente Administrativo Transversal','15','1','NO','S','op'],['DR Metropolitana','Gestor Familiar Programa EJE','17','3','SI','E','cob'],
+      ['Los Ríos','Director/a Regional','4','1','SI','C','crit'],['Los Ríos','Profesional Regional de Rendiciones','18','4','SI','S','op'],['Los Ríos','Chofer Transversal','18','4','NO','S','op'],
+      ['Arica y Parinacota','Director/a Regional','4','1','SI','C','crit'],['Arica y Parinacota','Coordinador/a Alianzas Público-Privadas','16','4','NO','S','op'],['Arica y Parinacota','Gestor Familiar Programa EJE','18','4','NO','E','cob'],
+      ['Ñuble','Director/a Regional','4','1','SI','C','crit'],['Ñuble','Encargado/a de Personas Regional','12','1','SI','J','sup'],['Ñuble','Encargado/a de Gestión Administrativa','14','1','NO','J','sup'],['Ñuble','Analista Técnico Contable','16','4','SI','S','op'],['Ñuble','Apoyo Técnico Regional Programas SyO','17','4','SI','S','op'],['Ñuble','Gestor Familiar Programa EJE','18','4','NO','E','cob'],['Ñuble','Agente de Desarrollo Local','19','3','NO','E','cob'],
+      ['Dirección Nacional','Director/a Ejecutivo/a','1C','1','SI','C','crit'],['Dirección Nacional','Subdirector/a de Usuarios','3','1','SI','J','sup'],['Dirección Nacional','Jefe/a de Gabinete','4','1','SI','J','sup'],['Dirección Nacional','Jefe/a Depto. Emprendimiento y Empleabilidad','5','1','SI','J','sup'],['Dirección Nacional','Jefe/a Departamento de Presupuesto','8','1','SI','J','sup'],['Dirección Nacional','Encargado/a de Innovación Central','7','1','SI','J','sup'],['Dirección Nacional','Coordinador/a Nacional Alianzas Público-Privadas','7','1','NO','S','op'],['Dirección Nacional','Auditor/a','7','1','NO','S','op'],['Dirección Nacional','Profesional de Control de Gestión Central','6','1','SI','S','op'],['Dirección Nacional','Profesional Desarrollo Organizacional','11','1','SI','S','op'],['Dirección Nacional','Profesional Sistemas Informáticos (Ciberseguridad)','12','1','SI','S','op'],['Dirección Nacional','Profesional Sistemas Informáticos Central','12','1','SI','S','op'],['Dirección Nacional','Profesional Sistemas Informáticos Central','14','3','SI','S','op'],['Dirección Nacional','Asistente Administrativo Transversal','10','1','SI','S','op'],['Dirección Nacional','Asistente Administrativo Transversal','10','1','NO','S','op'],['Dirección Nacional','Apoyo Provincial Programas SyO','16','4','NO','E','cob'],
+    ];
+    return raw.map(r=>({region:r[0],cargo:r[1],grado:r[2],programa:r[3],prov:r[4],cat:C[r[5]],level:r[6]}));
+  }
+  levelInfo(l){return ({crit:{label:'Riesgo legal y operacional',dot:'#d92d20',bg:'#fef3f2',tx:'#b42318'},sup:{label:'Riesgo de supervisión',dot:'#f79009',bg:'#fffaeb',tx:'#b54708'},cob:{label:'Riesgo de cobertura',dot:'#eab308',bg:'#fefce8',tx:'#854d0e'},op:{label:'Operacional',dot:'#2e90fa',bg:'#eff8ff',tx:'#175cd3'}})[l];}
+  via(x){
+    const c=x.cargo.toLowerCase();
+    if(c.includes('movilidad')) return 'mov';
+    if(x.level==='crit') return 'concurso';
+    if(c.includes('subdirector')) return 'concurso';
+    if(c.includes('gabinete')) return 'directa';
+    if(x.level==='sup') return 'interno';
+    if(x.level==='cob') return 'directa';
+    if(c.includes('asistente')||c.includes('chofer')||c.includes('secretar')) return 'directa';
+    return 'mixto';
+  }
+  viaInfo(k){return ({
+    concurso:{label:'Concurso público / ADP',tx:'#6d28d9',bg:'#f3effe'},
+    interno:{label:'Concurso interno',tx:'#0e7490',bg:'#e3f4f7'},
+    mov:{label:'Movilidad interna',tx:'#0f7a4f',bg:'#e7f6ee'},
+    mixto:{label:'Mixto (interno/externo)',tx:'#b45309',bg:'#fdf1e3'},
+    directa:{label:'Contratación directa',tx:'#516072',bg:'#eef1f4'},
+  })[k];}
+
+  nivelCentral(){
+    return [
+      {name:'Dirección Ejecutiva',code:'DE · Gabinete, Auditoría, Comunicaciones',total:23,color:'#16202e',depts:[['Auditoría Interna',6],['Comunicaciones',6],['Control de Gestión',5],['Innovación',3],['Gabinete DE',3]]},
+      {name:'Subd. Administración y Finanzas',code:'SAF / DAF',total:63,color:'#0f8378',depts:[['TICs / Transf. Digital',10],['Gestión Financiera',9],['Apoyo Técnico / Convenios',7],['Servicios Generales',7],['Adquisiciones',5],['Gestión Documental',5],['Presupuesto',4],['Rendiciones',3],['DAF',3]]},
+      {name:'Subd. Gestión de Programas',code:'SGP / DGP',total:37,color:'#0e7490',depts:[['Familias SSYOO',12],['SGP',9],['Estudios y Evaluación',6],['Habitabilidad',6],['Cooperación Intl.',3],['Desarrollo e Innov.',3],['Procesos y Mejora',4]]},
+      {name:'Subd. de Personas',code:'SDP',total:25,color:'#7c3aed',depts:[['Desarrollo Organizacional',9],['Gestión y Adm. Personas',7],['Bienestar',4],['Remuneraciones',3],['SDP',2]]},
+      {name:'Fiscalía',code:'Fiscalía',total:8,color:'#be123c',depts:[['Fiscalía',8]]},
+      {name:'Subd. de Usuarios',code:'SDU',total:3,color:'#b45309',depts:[['DPAC',2],['SDU',1]]},
+    ];
+  }
+
+  cealVals(){
+    // region, cealLevel, scoreComp, carga, liderazgo, casos, tasa, tendencia, riesgoClima
+    return [
+      ['Arica y Parinacota','Bajo',39.3,32.1,14.3,11,'34,4','up','ALTO'],
+      ['Tarapacá','Bajo',38.6,44.4,29.6,11,'—','up','BAJO'],
+      ['Antofagasta','Medio',38.4,34.4,18.8,4,'11,8','up','ALTO'],
+      ['Atacama','Bajo',15.3,18.5,14.8,6,'18,2','up','ALTO'],
+      ['Coquimbo','Bajo',24.8,28.9,13.2,3,'6,3','up','ALTO'],
+      ['Valparaíso','Bajo',29.5,28.6,14.3,12,'13,8','up','ALTO'],
+      ['Metropolitana','Medio',47.5,55.6,27.2,13,'10,3','up','ALTO'],
+      ['O\u2019Higgins','Medio',39.6,54.2,22.9,13,'18,3','flat','ALTO'],
+      ['Maule','Bajo',37.3,37.3,23.5,3,'4,8','flat','ALTO'],
+      ['Ñuble','Medio',38.9,68.8,12.5,8,'19,1','down','ALTO'],
+      ['Biobío','Bajo',33.9,44.4,16.7,2,'2,4','up','ALTO'],
+      ['La Araucanía','Alto',56.6,54.0,40.0,10,'13,2','up','ALTO'],
+      ['Los Ríos','Bajo',36.1,38.9,11.1,1,'—','down','BAJO'],
+      ['Los Lagos','Medio',41.5,37.2,20.9,12,'19,4','down','ALTO'],
+      ['Aysén','Bajo',19.2,24.1,13.8,4,'10,0','up','ALTO'],
+      ['Magallanes','Medio',38.1,33.3,26.7,5,'15,6','flat','ALTO'],
+      ['Nivel Central','Bajo',35.3,40.0,23.6,16,'10,3','flat','ALTO'],
+    ];
+  }
+
+  hojaRuta(){
+    return [
+      [1,'H1','Concursos ADP de 16 Directores/as Regionales + encargos formales interinos','Personas + DNSC','15-30 días','16 concursos publicados','CRÍTICA'],
+      [2,'H1','Resolución de subrogación / encargo de firma para todas las DR vacantes','Dirección Ejecutiva','15 días','16 resoluciones emitidas','CRÍTICA'],
+      [3,'H1','Protocolo Ley Karin en regiones con vacante directiva','Personas + Jurídica','15 días','16 circulares enviadas','CRÍTICA'],
+      [4,'H1','Crear 12 perfiles emergentes (Psicólogo, Fiscal, Oferta Extra…)','Personas','60 días','12 perfiles validados','ALTA'],
+      [5,'H1','Plan de regularización de 104 honorarios precarios (>3 años)','Finanzas + Personas','45 días','Plan calendarizado por región','ALTA'],
+      [6,'H2','Aplicar CEAL en 5 regiones de mayor IRPS (Araucanía, Ñuble, Los Lagos…)','Personas + SUSESO','90 días','5 informes CEAL','ALTA'],
+      [7,'H2','Dashboard de KPIs en Power BI / herramienta institucional','TI + Personas','90 días','Dashboard operativo','ALTA'],
+      [8,'H2','Actualizar resoluciones Coquimbo, Los Ríos, Aysén con Contraloría','Jurídica + DE','120 días','3 resoluciones actualizadas','MEDIA'],
+      [9,'H2','Política de Trabajo Remoto para cargos elegibles','Personas + TI','120 días','Política aprobada','MEDIA'],
+      [10,'H2','Plan de Sucesión para 208 func. ≥55 años — top-30 cargos críticos','Personas (DO)','150 días','Plan documentado','MEDIA'],
+      [11,'H3','Actualizar Catálogo 132 perfiles + 12 emergentes + competencias digitales','Personas + Jefaturas','12 meses','144 perfiles validados','MEDIA'],
+      [12,'H3','Implementar Modelo de Dotación Óptima Regional (3 capas)','Personas + CG + DE','12 meses','Modelo validado DNSC','MEDIA'],
+      [13,'H3','Gestionar dotaciones adicionales DIPRES (Araucanía +13, Metro +8…)','DE + Finanzas','15 meses','Aprobado en LP 2027','ALTA'],
+      [14,'H3','Sistema integrado Clima + Bienestar + IRPS + Ley Karin + CEAL','Personas + TI','18 meses','Sistema operativo','MEDIA'],
+    ];
+  }
+
+  docAreas(){
+    const D=(name,tag,file)=>({name,tag,file});
+    return [
+      {id:'do',label:'Desarrollo Organizacional',color:'#0f8378',count:78,desc:'Capacitación, selección, perfiles, integridad, desempeño y normativa interna de personas.',subs:[
+        {name:'Estructura y Dotación',count:9,docs:[D('Dashboard Dotación FOSIS 2026','XLS','docs/dashboard_dotacion.xlsx'),D('Matriz Nacional Diagnóstico 2026','XLS','docs/matriz_nacional.xlsx'),D('Nómina actualizada de funcionarios','XLS','docs/nomina_funcionarios.xlsx'),D('Metodología de cálculo de dotación','DOC','docs/metodologia_calculo.docx'),D('Informe Integral DO 2026','DOC','docs/informe_integral_do.docx')]},
+        {name:'Reclutamiento y Selección',count:6,docs:[D('Plataforma de Reclutamiento y Selección FOSIS','DOC','docs/plataforma_reclutamiento.docx'),D('Procedimiento Movilidad Interna FOSIS','PDF','docs/proc_movilidad_interna.pdf')]},
+        {name:'Capacitación',count:16,docs:[D('Estrategia y Plan de Capacitación 2026','PDF','docs/estrategia_capacitacion_2026.pdf'),D('Planilla PAC 2026 Desarrollo Org.','XLS','docs/planilla_pac_2026.xlsx'),D('Cronograma de capacitaciones FOSIS','XLS','docs/cronograma_capacitaciones.xlsx')]},
+        {name:'Evaluación del Desempeño',count:9,docs:[D('Procedimiento Evaluación del Desempeño V8','PDF','docs/proc_evaluacion_desempeno_v8.pdf'),D('REX CGR · Reclamos calificaciones 2025','PDF','docs/rex_cgr_reclamos_2025.pdf')]},
+        {name:'Comité de Integridad',count:10,docs:[D('RESEX FC-F-00019 Comité de Integridad 2026','PDF','docs/resex_comite_integridad_2026.pdf'),D('Código de Ética FOSIS','PDF','docs/codigo_etica.pdf'),D('Minuta Mesa de Integridad 2026','PDF','docs/minuta_integridad_2026.pdf')]},
+        {name:'Planificación DO',count:9,docs:[D('Plan DO 2026','XLS','docs/plan_do_2026.xlsx'),D('Política de Gestión y Desarrollo de Personas','PDF','docs/politica_gestion_personas.pdf')]},
+        {name:'Normativa y Procedimientos',count:12,docs:[D('Procedimiento Denuncia Acoso Laboral/Sexual','PDF','docs/proc_denuncia_acoso.pdf'),D('Ley 21.643 — Ley Karin','PDF','docs/ley_karin_21643.pdf'),D('Protocolo Prevención de Conflictos Laborales','PDF','docs/protocolo_conflictos.pdf')]},
+        {name:'Inducción y Reconocimiento',count:7,docs:[D('Procedimiento de Inducción 2026','DOC','docs/proc_induccion_2026.docx'),D('FC-P-00277 Procedimiento de Anotaciones','PDF','docs/proc_anotaciones.pdf')]},
+      ]},
+      {id:'cv',label:'Calidad de Vida y Ambientes Laborales',color:'#7c3aed',count:34,desc:'Teletrabajo, denuncias laborales, calidad de vida, inclusión y atención temprana psicológica.',subs:[
+        {name:'Teletrabajo y Trabajo Remoto',count:11,docs:[D('0136 Procedimiento Teletrabajo Funcionarios 2026','PDF','docs/proc_teletrabajo_2026.pdf'),D('Convenio Trabajo Remoto 2026','DOC','docs/convenio_trabajo_remoto.docx')]},
+        {name:'Denuncias Laborales',count:12,docs:[D('Formulario de denuncia FOSIS','PDF','docs/formulario_denuncia.pdf')]},
+        {name:'Programa Calidad de Vida',count:2,docs:[D('FC-P-00133 Programa Calidad de Vida 2026','PDF','docs/programa_calidad_vida_2026.pdf'),D('Plan Calidad de Vida FOSIS 2026','PDF','docs/plan_calidad_vida_2026.pdf')]},
+        {name:'Inclusión y Diversidad',count:3,docs:[D('Política de Inclusión y Diversidad','PDF','docs/politica_inclusion.pdf'),D('Protocolo de Inclusión Laboral','PDF','docs/protocolo_inclusion.pdf')]},
+      ]},
+      {id:'proc',label:'Procedimientos DO (vigentes)',color:'#0e7490',count:29,desc:'Políticas y procedimientos institucionales aprobados por resolución.',subs:[
+        {name:'Políticas',count:5,docs:[D('Política de Gestión y Desarrollo de Personas','PDF','docs/politica_gestion_personas.pdf'),D('Política de Compensaciones','PDF','docs/politica_compensaciones.pdf')]},
+        {name:'Procedimientos de personas',count:14,docs:[D('Reclutamiento y Selección Contrata y Honorarios','PDF','docs/proc_reclutamiento_contrata.pdf'),D('Contratación cargos planta y contrata V6','PDF','docs/proc_contratacion_planta.pdf'),D('Evaluación del Desempeño V8','PDF','docs/proc_evaluacion_desempeno_v8.pdf'),D('Movilidad Interna FOSIS','PDF','docs/proc_movilidad_interna.pdf')]},
+      ]},
+      {id:'karin',label:'Resoluciones Ley Karin',color:'#be123c',count:5,desc:'Investigaciones, sumarios y resoluciones asociadas a la Ley 21.643.',subs:[
+        {name:'Resoluciones e informes',count:5,docs:[D('0269 Aprueba informe y sobresee — Valparaíso','PDF','docs/resex_0269_valparaiso.pdf'),D('0270 Aprueba informe y absuelve — O\u2019Higgins','PDF','docs/resex_0270_ohiggins.pdf'),D('OF-85627 CGR Solicita informe','PDF','docs/of_85627_cgr.pdf'),D('Informe Denuncias Ley Karin','DOC','docs/informe_denuncias_karin.docx'),D('Reporte seguimiento VALS (abr 2026)','XLS','docs/reporte_seguimiento_vals.xlsx')]},
+      ]},
+      {id:'bt',label:'Señalética Buen Trato (ACHS)',color:'#b45309',count:12,desc:'Material gráfico de buen trato y ambientes laborales seguros.',subs:[
+        {name:'Señales',count:12,docs:[D('Espacio Seguro','PDF','docs/bt_espacio_seguro.pdf'),D('Espacio Respetuoso','PDF','docs/bt_espacio_respetuoso.pdf'),D('Violencia y Acoso','PDF','docs/bt_violencia_acoso.pdf'),D('Canales Oficiales','PDF','docs/bt_canales_oficiales.pdf'),D('Espacio Diverso','PDF','docs/bt_espacio_diverso.pdf')]},
+      ]},
+    ];
+  }
+
+  // ---------- helpers ----------
+  setView(v){ this.setState({view:v}); }
+  setSort(s){ this.setState({sort:s}); }
+  navBtn(active){ return `display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:${active?600:500};text-align:left;background:${active?'#0f8378':'transparent'};color:${active?'#fff':'#aeb6c4'}`; }
+  pctColor(p){ return p>=50?'#b42318':(p>=30?'#b54708':'#0f7a4f'); }
+  pctBg(p){ return p>=50?'#fef3f2':(p>=30?'#fffaeb':'#ecf7f1'); }
+
+  download(filename,text,mime){
+    const blob=new Blob(['\ufeff'+text],{type:mime||'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');
+    a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }
+  csv(rows){ return rows.map(r=>r.map(c=>{const s=String(c==null?'':c);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(';')).join('\n'); }
+
+  printReport(){
+    const u=this.units();const vac=this.vacancies();const cv=this.cealVals();
+    const fmt=n=>String(n).replace('.',',');
+    const uRows=u.map(x=>`<tr><td>${x.name}</td><td style="text-align:right">${x.real}</td><td style="text-align:right">${x.aut??'S/D'}</td><td style="text-align:right">${x.brecha==null?'S/D':(x.brecha>0?'+'+x.brecha:x.brecha)}</td><td style="text-align:right">${x.vac}</td><td style="text-align:right">${x.vcrit}</td><td style="text-align:right">${fmt(x.score)}</td></tr>`).join('');
+    const cvRows=cv.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td style="text-align:right">${fmt(r[2])}</td><td style="text-align:right">${r[5]}</td><td style="text-align:right">${r[6]}</td><td>${r[8]}</td></tr>`).join('');
+    const tr=this.state.track||this.defaultTrack();
+    const done=Object.values(tr).filter(s=>s==='hecho').length;
+    const html=`<!doctype html><html><head><meta charset="utf-8"><title>Informe Dotación FOSIS 2026</title>
+    <style>body{font-family:'Public Sans',Arial,sans-serif;color:#1d2433;margin:40px;font-size:12px}
+    h1{font-size:22px;margin:0 0 2px}h2{font-size:14px;margin:26px 0 10px;color:#0f8378;border-bottom:2px solid #0f8378;padding-bottom:4px}
+    .sub{color:#6b7280;font-size:12px;margin-bottom:8px}
+    .kpis{display:flex;gap:14px;margin:16px 0}
+    .kpi{flex:1;border:1px solid #e2e0d9;border-radius:8px;padding:12px}.kpi b{font-size:20px;display:block}.kpi span{color:#6b7280;font-size:11px}
+    table{width:100%;border-collapse:collapse;font-size:11px}th,td{border-bottom:1px solid #ececec;padding:6px 8px;text-align:left}
+    th{background:#f7f6f2;font-size:10px;letter-spacing:.3px}
+    @media print{@page{margin:14mm}}</style></head>
+    <body><h1>FOSIS · Informe de Dotación 2026</h1><div class="sub">Corte 31 may 2026 · Nómina May 2026 · CEAL-SUSESO 2025 · Sistema VALS · Generado ${new Date().toLocaleDateString('es-CL')}</div>
+    <div class="kpis"><div class="kpi"><b>1.039</b><span>Funcionarios activos</span></div><div class="kpi"><b>1.058</b><span>Dotación autorizada</span></div><div class="kpi"><b>68</b><span>Vacantes (41 críticas)</span></div><div class="kpi"><b>16</b><span>DR sin titular</span></div><div class="kpi"><b>134</b><span>Denuncias VALS</span></div></div>
+    <h2>1 · Dotación por unidad</h2><table><thead><tr><th>Unidad</th><th>Real</th><th>Autor.</th><th>Brecha</th><th>Vac.</th><th>Crít.</th><th>Score</th></tr></thead><tbody>${uRows}<tr style="font-weight:700"><td>TOTAL FOSIS</td><td style="text-align:right">1.039</td><td style="text-align:right">1.058</td><td style="text-align:right">+19</td><td style="text-align:right">68</td><td style="text-align:right">41</td><td style="text-align:right">91,9</td></tr></tbody></table>
+    <h2>2 · Clima psicosocial (CEAL) y denuncias Ley Karin</h2><table><thead><tr><th>Unidad</th><th>Riesgo CEAL</th><th>Score</th><th>Denuncias</th><th>Tasa/100</th><th>Riesgo clima</th></tr></thead><tbody>${cvRows}</tbody></table>
+    <h2>3 · Seguimiento Hoja de Ruta DO</h2><div class="sub">${done} de 14 acciones completadas · ${vac.length} vacantes en gestión</div>
+    <h2>4 · Control de procedimientos</h2><table><thead><tr><th>Código</th><th>Procedimiento</th><th>Área</th><th>Urgencia</th><th>Estado</th></tr></thead><tbody>${this.procedures().map(p=>{const st=this.procStatusOf(p[0]);return `<tr><td>${p[1]}</td><td>${p[2]}</td><td>${p[3]}</td><td>${({alta:'Alta',media:'Media',baja:'Baja'})[p[5]]}</td><td>${({pendiente:'Pendiente',proceso:'En revisión',actualizado:'Actualizado'})[st]}</td></tr>`;}).join('')}</tbody></table>
+    </body></html>`;
+    const w=window.open('','_blank');
+    if(!w)return;
+    w.document.write(html);w.document.close();w.focus();
+    setTimeout(()=>{try{w.print();}catch(e){}},500);
+  }
+
+  renderVals(){
+    const v=this.state.view;
+    const units=this.units();const maxReal=159;const vac=this.vacancies();
+    const filled=this.state.filled||{};
+    const vIdx=vac.map((x,i)=>({...x,idx:i,isFilled:!!filled[i]}));
+    const vTotalActive=vIdx.filter(x=>!x.isFilled).length;
+    const vCritActive=vIdx.filter(x=>!x.isFilled&&x.level!=='cob').length;
+    const vDrActive=vIdx.filter(x=>!x.isFilled&&x.cargo==='Director/a Regional').length;
+    const filledCount=vIdx.filter(x=>x.isFilled).length;
+    const realActive=1039+filledCount;
+    const fmtMiles=n=>n.toLocaleString('es-CL');
+    const activosTxt=fmtMiles(realActive);const totalRealTxt=fmtMiles(realActive);
+    const tBrecha=1058-realActive;const totalBrechaTxt=tBrecha>0?'+'+tBrecha:''+tBrecha;
+    const procDef=this.defaultProc();const procStMap=this.state.procSt||{};
+    const procPending=this.procedures().filter(p=>(procStMap[p[0]]||procDef[p[0]])!=='actualizado').length;
+
+    // ---- nav ----
+    const groups=[
+      ['PANORAMA',[['resumen','◉','Resumen','']]],
+      ['DOTACIÓN ÓPTIMA',[['dotacion','▤','Dotación','1.039'],['central','◳','Nivel Central','159'],['vacantes','○','Vacantes',String(vTotalActive)]]],
+      ['RIESGO ORGANIZACIONAL',[['riesgo','◍','Clima & Denuncias','134']]],
+      ['GESTIÓN',[['seguimiento','◇','Seguimiento','14'],['procedimientos','◫','Procedimientos',String(procPending)],['reportes','▥','Reportes',''],['documentos','▦','Documentos','157']]],
+    ];
+    const navGroups=groups.map(g=>({label:g[0],items:g[1].map(it=>({
+      icon:it[1],label:it[2],badge:it[3],onClick:()=>this.setView(it[0]),
+      style:this.navBtn(v===it[0]),
+      badgeStyle:`font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:20px;background:${v===it[0]?'rgba(255,255,255,.18)':'#28313f'};color:${v===it[0]?'#fff':'#7c8698'};${it[3]?'':'display:none'}`,
+    }))}));
+
+    const titles={resumen:['Panorama general','Dotación, brechas y prioridades'],dotacion:['Plantilla actual','Dotación por unidad'],central:['Nivel Central','Organigrama y dotación por subdirección'],vacantes:['Vacantes activas','68 cargos por proveer'],riesgo:['Clima & Denuncias','Riesgo psicosocial CEAL y Ley Karin'],seguimiento:['Seguimiento','Hoja de ruta DO 2026-2027'],procedimientos:['Procedimientos','Actualización y nivel de urgencia'],reportes:['Reportes','Exportar datos e informes'],documentos:['Repositorio documental','Documentos por área de trabajo']};
+    const t=titles[v];
+
+    // ---- resumen ----
+    const kpis=[{value:activosTxt,label:'Funcionarios activos',accent:'#0f8378'},{value:'1.058',label:'Dotación autorizada',accent:'#16202e'},{value:'98,1%',label:'Cobertura de perfiles',accent:'#0f8378'},{value:String(vTotalActive),label:'Vacantes activas',accent:'#f79009'},{value:String(vCritActive),label:'Vacantes críticas',accent:'#d92d20'},{value:String(vDrActive),label:'Direcciones Reg. sin titular',accent:'#d92d20'}];
+    const chartUnits=[...units].sort((a,b)=>b.real-a.real).map(u=>{const rw=(u.real/maxReal*100).toFixed(1);const aw=u.aut?(u.aut/maxReal*100).toFixed(1):null;return {short:u.short,real:u.real,autTxt:u.aut??'S/D',barStyle:`position:absolute;left:0;top:0;height:100%;width:${rw}%;background:#0f8378;border-radius:5px`,autMarkStyle:aw?`position:absolute;left:${aw}%;top:-2px;height:24px;width:2.5px;background:#16202e;border-radius:2px`:'display:none'};});
+    const cats=[['Conducción Estratégica','#d92d20'],['Jefatura / Encargado','#f79009'],['Ejecutor de Programa','#eab308'],['Soporte y Especialización','#2e90fa']].map(c=>({label:c[0],c:c[1],n:vac.filter(x=>x.cat===c[0]).length}));
+    const maxCat=Math.max(...cats.map(c=>c.n));
+    const catSummary=cats.map(c=>({label:c.label,count:c.n,barStyle:`height:100%;width:${(c.n/maxCat*100).toFixed(0)}%;background:${c.c};border-radius:4px`}));
+    const prioSummary=[{label:'Inmediata',dot:'#d92d20',count:units.filter(u=>u.prio===1).length},{label:'Urgente',dot:'#f79009',count:units.filter(u=>u.prio===2).length},{label:'Planificada',dot:'#5b9279',count:units.filter(u=>u.prio===3).length}];
+
+    // ---- nivel central ----
+    const centralKpis=[{value:'159',label:'DOTACIÓN'},{value:'30',label:'ESTRATÉGICO'},{value:'103',label:'OPERATIVO'},{value:'17',label:'ESPECIALISTA'}];
+    const nc=this.nivelCentral();
+    const subdirs=nc.map(s=>({name:s.name,code:s.code,total:s.total,color:s.color,pct:((s.total/159*100).toFixed(1).replace('.',','))+'%',barStyle:`height:100%;width:${(s.total/63*100).toFixed(0)}%;background:${s.color};border-radius:3px`,depts:s.depts.map(d=>({name:d[0],count:d[1]}))}));
+
+    // ---- dotacion table ----
+    const sort=this.state.sort;const sk={real:'real',brecha:'brechaAbs',vac:'vac',score:'score'};
+    const tu=[...units].map(u=>({...u,brechaAbs:u.brecha==null?-99:u.brecha}));
+    tu.sort((a,b)=>b[sk[sort]]-a[sk[sort]]);
+    const pm={1:['Inmediata','#fef3f2','#b42318'],2:['Urgente','#fffaeb','#b54708'],3:['Planificada','#f1f3f5','#516072']};
+    const tableUnits=tu.map(u=>{const p=pm[u.prio];const sc=u.score;const scC=sc>=90?'#0f8378':sc>=80?'#b54708':'#b42318';return {short:u.short,size:u.size,real:u.real,autTxt:u.aut??'S/D',brechaTxt:u.brecha==null?'S/D':(u.brecha>0?'+'+u.brecha:''+u.brecha),brechaStyle:`font-weight:600;color:${u.brecha==null?'#aab0bb':(u.brecha>0?'#0f8378':(u.brecha<0?'#b42318':'#6b7280'))}`,vac:u.vac,vcrit:u.vcrit,vcritStyle:`font-weight:600;color:${u.vcrit>=4?'#b42318':(u.vcrit>=2?'#b54708':'#6b7280')}`,score:String(sc).replace('.',','),scoreBar:`height:100%;width:${sc}%;background:${scC};border-radius:3px`,prioLabel:p[0],prioStyle:`display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;background:${p[1]};color:${p[2]}`};});
+    const sortTabs=[['real','Real'],['brecha','Brecha'],['vac','Vacantes'],['score','Score']].map(s=>({label:s[1],onClick:()=>this.setSort(s[0]),style:`border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:7px;background:${sort===s[0]?'#fff':'transparent'};color:${sort===s[0]?'#16202e':'#7a828f'};box-shadow:${sort===s[0]?'0 1px 2px rgba(0,0,0,.08)':'none'}`}));
+
+    // ---- vacantes ----
+    const fr=this.state.vacRegion,fi=this.state.vacImpact,fvia=this.state.vacVia;
+    const lo={crit:0,sup:1,cob:2,op:3};
+    let vl=vIdx.filter(x=>(fr==='all'||x.region===fr)&&(fi==='all'||x.level===fi)&&(fvia==='all'||this.via(x)===fvia));
+    vl.sort((a,b)=>{ if(a.isFilled!==b.isFilled) return a.isFilled?1:-1; return lo[a.level]-lo[b.level]; });
+    const provStyle=p=>`font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;background:${p==='SI'?'#e7f6f3':'#f1f3f5'};color:${p==='SI'?'#0f6b62':'#6b7280'}`;
+    const vacList=vl.map(x=>{const li=this.levelInfo(x.level);const vi=this.viaInfo(this.via(x));const f=x.isFilled;return {cargo:x.cargo,region:x.region,grado:x.grado,programa:x.programa,
+      onClick:()=>this.toggleFilled(x.idx),
+      cardStyle:`background:${f?'#f5f6f4':'#fff'};border:1px solid #e6e4dd;border-left:4px solid ${f?'#cdd2cc':li.dot};border-radius:11px;padding:15px 17px;cursor:pointer;${f?'opacity:.72;':''}`,
+      cargoStyle:`font-weight:600;font-size:13.5px;line-height:1.3;${f?'color:#9098a4;text-decoration:line-through':'color:#16202e'}`,
+      badge:f?'✓ Provista':(x.prov==='SI'?'A proveer':'Sin proveer'),
+      badgeStyle:f?'font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;background:#e7f6ee;color:#0f7a4f':provStyle(x.prov),
+      viaLabel:vi.label,viaStyle:`display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px;background:${f?'#eef0ed':vi.bg};color:${f?'#9098a4':vi.tx}`,
+      dotShown:f?'#cdd2cc':li.dot,levelLabel:li.label,
+      levelStyle:`display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:${f?'#eef0ed':li.bg};color:${f?'#9098a4':li.tx}`,
+      action:f?'↺ clic para deshacer':x.cat};});
+    const vacShownActive=vl.filter(x=>!x.isFilled).length;
+    const vacShownFilled=vl.filter(x=>x.isFilled).length;
+    const viaKeys=['concurso','interno','mov','mixto','directa'];
+    const viaSummary=viaKeys.map(k=>{const vi=this.viaInfo(k);const count=vIdx.filter(x=>!x.isFilled&&this.via(x)===k).length;return {label:vi.label,count,style:`display:inline-flex;align-items:center;gap:7px;font-size:12px;background:${vi.bg};color:${vi.tx};padding:4px 11px;border-radius:20px;font-weight:600`};});
+    const viaOpts=[['all','Todas'],['concurso','Concurso/ADP'],['interno','Interno'],['mov','Movilidad'],['mixto','Mixto'],['directa','Directa']];
+    const viaChips=viaOpts.map(o=>({label:o[1],onClick:()=>this.setState({vacVia:o[0]}),style:`border:1px solid ${fvia===o[0]?'#0f8378':'#dcdad3'};cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:20px;background:${fvia===o[0]?'#0f8378':'#fff'};color:${fvia===o[0]?'#fff':'#6b7280'}`}));
+    const regions=[...new Set(vac.map(x=>x.region))];
+    const regionOptions=[{value:'all',label:'Todas las regiones',selected:fr==='all'},...regions.map(r=>({value:r,label:r,selected:fr===r}))];
+    const impacts=[['all','Todos','#6b7280'],['crit','Crítico','#d92d20'],['sup','Supervisión','#f79009'],['cob','Cobertura','#eab308'],['op','Operacional','#2e90fa']];
+    const impactChips=impacts.map(im=>({label:im[1],onClick:()=>this.setState({vacImpact:im[0]}),style:`border:1px solid ${fi===im[0]?im[2]:'#dcdad3'};cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:20px;background:${fi===im[0]?im[2]:'#fff'};color:${fi===im[0]?'#fff':'#6b7280'}`}));
+
+    // ---- riesgo & denuncias ----
+    const riesgoKpis=[{value:'134',label:'Denuncias VALS 2018-2026',accent:'#be123c'},{value:'1',label:'Región CEAL en riesgo ALTO (Araucanía)',accent:'#d92d20'},{value:'16',label:'Denuncias en Nivel Central',accent:'#f79009'},{value:'Dir. Reg.',label:'Perfil más denunciado',accent:'#16202e'}];
+    const cealBadge={Alto:['#fef3f2','#b42318'],Medio:['#fffaeb','#b54708'],Bajo:['#ecf7f1','#0f7a4f']};
+    const tend={up:['↑ Aumenta','#fef3f2','#b42318'],flat:['→ Estable','#f1f3f5','#516072'],down:['↓ Disminuye','#ecf7f1','#0f7a4f']};
+    const riesgoRows=this.cealVals().map(r=>{const cb=cealBadge[r[1]];const td=tend[r[7]];const cargaC=this.pctColor(r[3]),lidC=this.pctColor(r[4]);return {region:r[0],cealLabel:'Riesgo '+r[1],cealStyle:`display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:${cb[0]};color:${cb[1]}`,score:String(r[2]).replace('.',','),carga:r[3].toFixed(0)+'%',cargaStyle:`font-weight:600;padding:2px 7px;border-radius:5px;background:${this.pctBg(r[3])};color:${cargaC}`,lid:r[4].toFixed(0)+'%',lidStyle:`font-weight:600;padding:2px 7px;border-radius:5px;background:${this.pctBg(r[4])};color:${lidC}`,casos:r[5],tasa:r[6],tend:td[0],tendStyle:`display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:${td[1]};color:${td[2]}`};});
+    const tipoRaw=[['Maltrato / Agresión',88,'65,7%','#be123c'],['Maltrato / Acoso Laboral',19,'14,2%','#d92d20'],['Acoso Laboral',11,'8,2%','#f79009'],['Maltrato (general)',10,'7,5%','#eab308'],['Acoso Sexual',5,'3,7%','#7c3aed']];
+    const maxTipo=88;
+    const tipologia=tipoRaw.map(x=>({label:x[0],count:x[1],pct:x[2],barStyle:`height:100%;width:${(x[1]/maxTipo*100).toFixed(0)}%;background:${x[3]};border-radius:4px`}));
+    const hallazgos=[{t:'Araucanía:',d:'única región Riesgo Alto CEAL + 10 casos VALS + 54% carga. Triple correlación crítica.'},{t:'Ñuble:',d:'mayor carga de trabajo del país (68,8% en riesgo alto) por déficit estructural de dotación.'},{t:'Metropolitana:',d:'carga 55,6% + 13 denuncias — sobrecarga silenciosa en la región más grande.'},{t:'Patrón sistémico:',d:'regiones con carga >50% tienen tasa VALS promedio 17,2 vs 11,8 en regiones <35%.'}];
+    const ktag=t=>{const m={PDF:['#fdecec','#c0392b'],DOC:['#e8eefc','#1d4ed8'],XLS:['#e7f6ee','#0f7a4f']};const c=m[t];return `font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 6px;border-radius:5px;flex:none;width:34px;text-align:center;background:${c[0]};color:${c[1]}`;};
+    const karinDocs=[['Informe Denuncias Ley Karin','DOC','docs/informe_denuncias_karin.docx'],['Reporte seguimiento VALS (abr 2026)','XLS','docs/reporte_seguimiento_vals.xlsx'],['Formulario de denuncia FOSIS','PDF','docs/formulario_denuncia.pdf'],['Ley 21.643 — Ley Karin','PDF','docs/ley_karin_21643.pdf']].map(d=>({name:d[0],tag:d[1],file:d[2],tagStyle:ktag(d[1])}));
+
+    // ---- seguimiento ----
+    const tr=this.state.track||this.defaultTrack();
+    const hr=this.hojaRuta();
+    const total=hr.length;
+    const done=hr.filter(a=>tr[a[0]]==='hecho').length;
+    const curso=hr.filter(a=>tr[a[0]]==='curso').length;
+    const pend=total-done-curso;
+    const horizMeta={H1:['H1 · Inmediato','#fef3f2','#b42318','#d92d20'],H2:['H2 · Corto plazo','#fff7ed','#b54708','#f79009'],H3:['H3 · Estructural','#eef6ff','#175cd3','#2e90fa']};
+    const prioMeta={'CRÍTICA':['#fef3f2','#b42318'],'ALTA':['#fffaeb','#b54708'],'MEDIA':['#f1f3f5','#516072']};
+    const segH=this.state.segH;
+    const segFilters=[['all','Todas'],['H1','H1'],['H2','H2'],['H3','H3']].map(f=>({label:f[1],onClick:()=>this.setState({segH:f[0]}),style:`border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:7px;background:${segH===f[0]?'#fff':'transparent'};color:${segH===f[0]?'#16202e':'#7a828f'};box-shadow:${segH===f[0]?'0 1px 2px rgba(0,0,0,.08)':'none'}`}));
+    const statusDefs=[['pendiente','Pendiente','#e2dfd6','#6b7280'],['curso','En curso','#f0a020','#fff'],['hecho','Hecho','#0f8378','#fff']];
+    const segList=hr.filter(a=>segH==='all'||a[1]===segH).map(a=>{
+      const st=tr[a[0]]||'pendiente';const hm=horizMeta[a[1]];const pmx=prioMeta[a[6]];
+      const barColor=st==='hecho'?'#0f8378':st==='curso'?'#f0a020':'#d7d3c8';
+      return {num:String(a[0]).padStart(2,'0'),horizonte:hm[0],horizStyle:`font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:${hm[1]};color:${hm[2]}`,prioLabel:a[6],prioStyle:`font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:${pmx[0]};color:${pmx[1]}`,title:a[2],resp:a[3],plazo:a[4],indicador:a[5],barColor,
+        statusBtns:statusDefs.map(s=>({label:s[1],onClick:()=>this.setStatus(a[0],s[0]),style:`border:1px solid ${st===s[0]?s[2]:'#e2dfd6'};cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;background:${st===s[0]?s[2]:'#fff'};color:${st===s[0]?s[3]:'#9098a4'}`}))};
+    });
+
+    // ---- reportes ----
+    const fmt=n=>String(n).replace('.',',');
+    const reportCards=[
+      {fmt:'CSV',title:'Dotación por unidad',desc:'17 unidades · real, autorizada, brecha, vacantes y score.',onClick:()=>this.download('FOSIS_dotacion_2026.csv',this.csv([['Unidad','Tamaño','Real','Autorizada','Brecha','Vacantes','Críticas','Score','Prioridad'],...units.map(u=>[u.name,u.size,u.real,u.aut??'S/D',u.brecha==null?'S/D':u.brecha,u.vac,u.vcrit,fmt(u.score),u.prio===1?'Inmediata':u.prio===2?'Urgente':'Planificada'])]))},
+      {fmt:'CSV',title:'Vacantes y vía de provisión',desc:'68 cargos · región, grado, categoría, impacto y vía.',onClick:()=>this.download('FOSIS_vacantes_2026.csv',this.csv([['Región','Cargo','Grado','Programa','Proveer','Categoría','Impacto','Vía de provisión','Estado'],...vIdx.map(x=>[x.region,x.cargo,x.grado,x.programa,x.prov,x.cat,this.levelInfo(x.level).label,this.viaInfo(this.via(x)).label,x.isFilled?'Provista':'Vacante'])]))},
+      {fmt:'CSV',title:'Clima CEAL y denuncias',desc:'CEAL-SUSESO + 134 denuncias VALS por unidad.',onClick:()=>this.download('FOSIS_clima_denuncias.csv',this.csv([['Unidad','Riesgo CEAL','Score','Carga%','Liderazgo%','Denuncias','Tasa/100','Tendencia','Riesgo clima'],...this.cealVals().map(r=>[r[0],r[1],fmt(r[2]),r[3],r[4],r[5],r[6],r[7]==='up'?'Aumenta':r[7]==='down'?'Disminuye':'Estable',r[8]])]))},
+      {fmt:'CSV',title:'Seguimiento Hoja de Ruta',desc:'14 acciones · estado actual, responsable y plazo.',onClick:()=>this.download('FOSIS_seguimiento.csv',this.csv([['N','Horizonte','Acción','Responsable','Plazo','Indicador','Prioridad','Estado'],...hr.map(a=>[a[0],a[1],a[2],a[3],a[4],a[5],a[6],(tr[a[0]]||'pendiente')])]))},
+      {fmt:'CSV',title:'Nivel Central',desc:'Dotación por subdirección y departamento.',onClick:()=>this.download('FOSIS_nivel_central.csv',this.csv([['Subdirección','Código','Departamento','Dotación'],...nc.flatMap(s=>s.depts.map(d=>[s.name,s.code,d[0],d[1]]))]))},
+      {fmt:'CSV',title:'Control de procedimientos',desc:'16 procedimientos · urgencia, estado y motivo.',onClick:()=>this.download('FOSIS_procedimientos.csv',this.csv([['Código','Procedimiento','Área','Motivo','Urgencia','Estado'],...allProc.map(p=>[p.code,p.name,p.area,p.motivo,({alta:'Alta',media:'Media',baja:'Baja'})[p.prio],({pendiente:'Pendiente',proceso:'En revisión',actualizado:'Actualizado'})[p.st]])]))},
+    ];
+
+    // ---- procedimientos ----
+    const prioMetaP={alta:['Alta','#fef3f2','#b42318','#d92d20'],media:['Media','#fffaeb','#b54708','#f79009'],baja:['Baja','#f1f3f5','#516072','#cdd2cc']};
+    const stMetaP={pendiente:['Pendiente','#e2dfd6','#6b7280'],proceso:['En revisión','#f0a020','#fff'],actualizado:['Actualizado','#0f8378','#fff']};
+    const fprio=this.state.procPrio;const prioOrd={alta:0,media:1,baja:2};
+    const allProc=this.procedures().map(p=>({id:p[0],code:p[1],name:p[2],area:p[3],motivo:p[4],prio:p[5],file:p[7],st:this.procStatusOf(p[0])}));
+    const procUpd=allProc.filter(p=>p.st==='actualizado').length;
+    const procAltaPend=allProc.filter(p=>p.prio==='alta'&&p.st!=='actualizado').length;
+    const procKpis=[{value:'16',label:'Procedimientos en control',accent:'#0e7490'},{value:String(16-procUpd),label:'Por actualizar',accent:'#b54708'},{value:String(procAltaPend),label:'Urgencia alta pendiente',accent:'#d92d20'},{value:String(procUpd),label:'Actualizados',accent:'#0f8378'}];
+    const procPrioChips=[['all','Todas',allProc.length],['alta','Alta',allProc.filter(p=>p.prio==='alta').length],['media','Media',allProc.filter(p=>p.prio==='media').length],['baja','Baja',allProc.filter(p=>p.prio==='baja').length]].map(o=>({label:o[1]+' ('+o[2]+')',onClick:()=>this.setState({procPrio:o[0]}),style:`border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:7px;background:${fprio===o[0]?'#fff':'transparent'};color:${fprio===o[0]?'#16202e':'#7a828f'};box-shadow:${fprio===o[0]?'0 1px 2px rgba(0,0,0,.08)':'none'}`}));
+    const ptag=t=>{const m={PDF:['#fdecec','#c0392b'],DOC:['#e8eefc','#1d4ed8']};const c=m[t];return `font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 6px;border-radius:5px;flex:none;width:34px;text-align:center;background:${c[0]};color:${c[1]}`;};
+    let procFiltered=allProc.filter(p=>fprio==='all'||p.prio===fprio);
+    procFiltered.sort((a,b)=>{const ao=a.st==='actualizado'?1:0,bo=b.st==='actualizado'?1:0;if(ao!==bo)return ao-bo;return prioOrd[a.prio]-prioOrd[b.prio];});
+    const stDefs=[['pendiente','Pendiente'],['proceso','En revisión'],['actualizado','Actualizado']];
+    const procLog=this.state.procLog||{};const draft=this.state.draft||{};
+    const procList=procFiltered.map(p=>{const pm=prioMetaP[p.prio];const upd=p.st==='actualizado';const tg=p.file.endsWith('.docx')?'DOC':'PDF';
+      const logs=procLog[p.id]||[];const exp=this.state.procExp===p.id;
+      return {code:p.code,name:p.name,area:p.area,motivo:p.motivo,file:p.file,tag:tg,tagStyle:ptag(tg),
+        barColor:upd?'#0f8378':pm[3],
+        prioLabel:'Urgencia '+pm[0],prioStyle:`font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:${pm[1]};color:${pm[2]}`,
+        nameStyle:`font-size:14px;font-weight:600;color:#16202e;margin-top:8px;line-height:1.35;${upd?'':''}`,
+        expanded:exp,
+        onToggle:()=>this.toggleProcExp(p.id),
+        toggleLabel:(exp?'▾ ':'▸ ')+'Actualizaciones'+(logs.length?' ('+logs.length+')':''),
+        toggleStyle:`border:1px solid ${exp?'#0f8378':'#dcdad3'};cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;padding:5px 11px;border-radius:7px;background:${exp?'#e7f6f3':'#fff'};color:${exp?'#0f6b62':'#6b7280'};white-space:nowrap`,
+        logs:logs.map((e,i)=>({date:e.date,ver:e.ver,note:e.note,hasVer:!!e.ver,
+          hasFile:!!e.fileKey,fileName:e.fileName||'',fileSize:this.fmtSize(e.fileSize),
+          onOpen:()=>this.openAttachment(e.fileKey,e.fileName),
+          onDel:()=>this.delProcUpdate(p.id,i)})),
+        hasLogs:logs.length>0,
+        verVal:draft[p.id+'_ver']||'',noteVal:draft[p.id+'_note']||'',
+        onVer:(ev)=>this.setDraft(p.id,'ver',ev.target.value),
+        onNote:(ev)=>this.setDraft(p.id,'note',ev.target.value),
+        onPickFile:()=>this.pickFile(p.id),
+        onClearFile:()=>this.clearDraftFile(p.id),
+        hasDraftFile:!!draft[p.id+'_file'],
+        draftFileName:draft[p.id+'_file']?draft[p.id+'_file'].name:'',
+        onAdd:()=>this.addProcUpdate(p.id),
+        statusBtns:stDefs.map(s=>{const sm=stMetaP[s[0]];const on=p.st===s[0];return {label:s[1],onClick:()=>this.setProcSt(p.id,s[0]),style:`border:1px solid ${on?sm[1]:'#e2dfd6'};cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;background:${on?sm[1]:'#fff'};color:${on?sm[2]:'#9098a4'}`};})};});
+    const procActualizados=procUpd;
+
+    // ---- documentos ----
+    const areas=this.docAreas();
+    const areaTabs=areas.map(a=>({label:a.label,color:a.color,count:a.count,onClick:()=>this.setState({area:a.id}),style:`display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:${this.state.area===a.id?700:500};text-align:left;background:${this.state.area===a.id?'#f3f5f4':'transparent'};color:${this.state.area===a.id?'#16202e':'#5b6573'}`}));
+    const cur=areas.find(a=>a.id===this.state.area)||areas[0];
+    const dtag=t=>{const m={PDF:['#fdecec','#c0392b'],DOC:['#e8eefc','#1d4ed8'],XLS:['#e7f6ee','#0f7a4f'],PPT:['#fdeede','#c2620e']};const c=m[t]||['#f1f3f5','#6b7280'];return `font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 6px;border-radius:5px;flex:none;width:36px;text-align:center;background:${c[0]};color:${c[1]}`;};
+    const areaSubs=cur.subs.map(s=>({name:s.name,count:s.count,docs:s.docs.map(d=>({name:d.name,tag:d.tag,file:d.file,tagStyle:dtag(d.tag)}))}));
+
+    return {
+      navGroups,pageKicker:t[1],pageTitle:t[0],
+      isResumen:v==='resumen',isDotacion:v==='dotacion',isCentral:v==='central',isVacantes:v==='vacantes',isRiesgo:v==='riesgo',isSeguimiento:v==='seguimiento',isProcedimientos:v==='procedimientos',isReportes:v==='reportes',isDocumentos:v==='documentos',
+      kpis,chartUnits,catSummary,prioSummary,
+      centralKpis,subdirs,
+      tableUnits,sortTabs,
+      activosTxt,totalRealTxt,totalBrechaTxt,
+      vacList,vacActive:vacShownActive,vacFilled:vacShownFilled,viaSummary,viaChips,regionOptions,onRegionChange:(e)=>this.setState({vacRegion:e.target.value}),impactChips,onResetFilled:()=>this.resetFilled(),resetStyle:'border:1px solid #dcdad3;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:8px;background:#fff;color:#6b7280;'+(vacShownFilled>0?'':'display:none'),
+      riesgoKpis,riesgoRows,tipologia,hallazgos,karinDocs,
+      segDone:done,segCurso:curso,segPend:pend,segTotal:total,
+      segBarDone:`height:100%;width:${(done/total*100).toFixed(1)}%;background:#0f8378`,segBarCurso:`height:100%;width:${(curso/total*100).toFixed(1)}%;background:#f0a020`,
+      segFilters,segList,
+      procKpis,procPrioChips,procList,procActualizados,
+      reportCards,onPrint:()=>this.printReport(),
+      areaTabs,areaTitle:cur.label,areaColor:cur.color,areaDesc:cur.desc,areaSubs,
+    };
+  }
+}
+</script>
+</body>
+</html>
